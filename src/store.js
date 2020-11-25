@@ -1,0 +1,85 @@
+import $ from 'jquery'
+import {createStore} from 'vuex'
+
+const state = {
+  status: {},
+  requests: [],
+  vmugaps: [],
+  hrdgaps: [],
+  config:  [],
+}
+
+const getters = {
+  totalSize(state) {
+    return state.status.hrd ? state.status.hrd.gap : 0
+  },
+  totalGap(state) {
+    return state.status.hrd ? state.status.hrd.size : 0
+  },
+  totalRequests(state) {
+    return state.requests ? state.requests.length : 0
+  },
+  totalHRD(state) {
+    return state.status.hrd ? state.status.hrd.gap : 0
+  },
+  totalVMU(state) {
+    return state.status.vmu ? state.status.vmu.gap : 0
+  }
+}
+
+const mutations = {
+  'update.status'(state, status) {
+    state.status = status
+  },
+  'update.requests'(state, requests) {
+    state.requests = requests
+  },
+  'update.vmu.gaps'(state, gaps) {
+    state.vmugaps = gaps
+  },
+  'update.hrd.gaps'(state, gaps) {
+    state.hrdgaps = gaps
+  },
+  'update.config'(state, config) {
+    state.config = config
+  }
+}
+
+function fetchData(url, commit, what) {
+  return fetch(url, {headers: {accept: 'application/json'}}).then(rs => {
+    if (!rs.ok) {
+      return Promise.reject(rs.statusText)
+    }
+    return rs.json()
+  }).then(rs => {
+    commit(`update.${what}`, rs)
+  })
+}
+
+const actions = {
+  'fetch.status'({commit}) {
+    return fetchData(`${process.env.VUE_APP_API}/status/`, commit, "status")
+  },
+  'fetch.config'({commit}) {
+    return fetchData(`${process.env.VUE_APP_API}/config/`, commit, "config")
+  },
+  'fetch.requests'({commit}, q) {
+    let url = `${process.env.VUE_APP_API}/requests/?${$.param(q)}`
+    return fetchData(url, commit, "requests")
+  },
+  'fetch.vmu.gaps'({commit}, q) {
+    let url = `${process.env.VUE_APP_API}/archives/vmu/gaps/?${$.param(q)}`
+    return fetchData(url, commit, "vmu.gaps")
+  },
+  'fetch.hrd.gaps'({commit}, q) {
+    let url = `${process.env.VUE_APP_API}/archives/hrd/gaps/?${$.param(q)}`
+    return fetchData(url, commit, "hrd.gaps")
+  },
+}
+
+export default createStore({
+  state,
+  getters,
+  mutations,
+  actions,
+})
