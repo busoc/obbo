@@ -12,7 +12,12 @@
         <select id="channel" class="form-control form-control-sm mx-2">
         </select>
       </form>
-      <SortBy :values="['time', 'channel', 'date', 'missing']" :empty="true"/>
+      <SortBy :values="['time', 'channel', 'date', 'missing']"
+        :empty="true"
+        :field="field"
+        @update:field="field = $event"
+        :order="order"
+        @update:order="order = $event"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -59,6 +64,12 @@ export default {
   updated() {
     feather.replace()
   },
+  data() {
+    return {
+      field: "",
+      order: "",
+    }
+  },
   computed: {
     gaps() {
       return this.$store.state.hrdgaps
@@ -67,6 +78,9 @@ export default {
   methods: {
     fetch() {
       this.$store.dispatch('fetch.hrd.gaps')
+    },
+    orderData() {
+      return this.$store.getters.sortGapsHRD(this.field, this.order)
     },
   },
   components: {

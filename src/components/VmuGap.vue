@@ -15,7 +15,12 @@
         <select id="source" class="form-control form-control-sm mx-2">
         </select>
       </form>
-      <SortBy :values="['time', 'record', 'source', 'date', 'missing']" :empty="true"/>
+      <SortBy :values="['time', 'record', 'source', 'date', 'missing']"
+        :empty="true"
+        :field="field"
+        @update:field="field = $event"
+        :order="order"
+        @update:order="order = $event"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -61,17 +66,26 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => vm.fetch())
   },
+  data() {
+    return {
+      field: "",
+      order: "",
+    }
+  },
   updated() {
     feather.replace()
   },
   computed: {
     gaps() {
-      return this.$store.state.vmugaps
+      return this.orderData()
     },
   },
   methods: {
     fetch() {
       this.$store.dispatch('fetch.vmu.gaps')
+    },
+    orderData() {
+      return this.$store.getters.sortGapsVMU(this.field, this.order)
     },
   },
   components: {

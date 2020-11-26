@@ -18,7 +18,12 @@
           <option value="manual">manual</option>
         </select>
       </form>
-      <SortBy :values="['time', 'date', 'status', 'priority', 'automatic']" :empty="true"/>
+      <SortBy :values="['time', 'date', 'status', 'priority', 'automatic']"
+        :empty="true"
+        :field="field"
+        @update:field="field = $event"
+        :order="order"
+        @update:order="order = $event"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -66,18 +71,27 @@ export default {
   beforeRouteEnter (to, from, next) {
     next(vm => vm.fetch())
   },
+  data() {
+    return {
+      field: "",
+      order: "",
+    }
+  },
   updated() {
     feather.replace()
   },
   computed: {
     requests() {
-      return this.$store.state.requests
+      return this.orderData()
     },
   },
   methods: {
     fetch() {
       this.$store.dispatch('fetch.requests')
     },
+    orderData() {
+      return this.$store.getters.sortRequests(this.field, this.order)
+    }
   },
   components: {
     PageHeader,

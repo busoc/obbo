@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import _ from 'lodash'
 import {createStore} from 'vuex'
 
 const state = {
@@ -9,7 +10,20 @@ const state = {
   config:  [],
 }
 
+function orderArray(arr, field, order) {
+  return field ? _.orderBy(arr, field, order) : arr
+}
+
 const getters = {
+  sortRequests: (state) => (field, order) => {
+    return orderArray(state.requests, field, order)
+  },
+  sortGapsVMU: (state) => (field, order) => {
+    return orderArray(state.vmugaps, field, order)
+  },
+  sortGapsHRD: (state) => (field, order) => {
+    return orderArray(state.hrdgaps, field, order)
+  },
   totalSize(state) {
     return state.status.hrd ? state.status.hrd.gap : 0
   },
