@@ -12,3 +12,11 @@ body {
   stroke-linejoin: round;
   fill: none;
 }
+
+form.filter-form input[type=datetime-local] {
+  width: 180px;
+}
+
+form.filter-form select {
+  width: 160px;
+}

@@ -3,7 +3,7 @@
     <router-view></router-view>
     <PageHeader :title="'HRD Gaps'"/>
     <div class="d-flex justify-content-between my-3 px-3">
-      <form class="form-inline">
+      <form class="form-inline filter-form">
         <label for="dtstart">Start Date</label>
         <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
         <label for="dtend">End Date</label>

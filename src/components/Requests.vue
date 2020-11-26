@@ -3,19 +3,21 @@
     <router-view></router-view>
     <PageHeader :title="'Replay'"/>
     <div class="d-flex justify-content-between my-3 px-3">
-      <form class="form-inline">
+      <form class="form-inline filter-form">
         <label for="dtstart">Start Date</label>
         <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
         <label for="dtend">End Date</label>
         <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
         <label for="status">Status</label>
         <select id="status" class="form-control form-control-sm mx-2">
+          <option></option>
+          <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
         <label for="mode">Mode</label>
         <select id="mode" class="form-control form-control-sm mx-2">
           <option value=""></option>
-          <option value="automatic">automatic</option>
-          <option value="manual">manual</option>
+          <option value="automatic" class="text-capitalize">automatic</option>
+          <option value="manual" class="text-capitalize">manual</option>
         </select>
       </form>
       <SortBy :values="['time', 'date', 'status', 'priority', 'automatic']"
@@ -62,6 +64,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
@@ -75,6 +78,7 @@ export default {
     return {
       field: "",
       order: "",
+      statuslist: [],
     }
   },
   updated() {
@@ -88,6 +92,7 @@ export default {
   methods: {
     fetch() {
       this.$store.dispatch('fetch.requests')
+      this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
     },
     orderData() {
       return this.$store.getters.sortRequests(this.field, this.order)

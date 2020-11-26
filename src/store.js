@@ -59,14 +59,24 @@ const mutations = {
   }
 }
 
+const headers = {
+  accept: 'application/json',
+}
+
 function fetchData(url, commit, what) {
-  return fetch(url, {headers: {accept: 'application/json'}}).then(rs => {
+  return fetch(url, {headers}).then(rs => {
     if (!rs.ok) {
       return Promise.reject(rs.statusText)
     }
     return rs.json()
   }).then(rs => {
     commit(`update.${what}`, rs)
+  })
+}
+
+function fetchBasic(url) {
+  return fetch(url, {headers}).then(rs => {
+    return rs.ok ? rs.json() : []
   })
 }
 
@@ -88,6 +98,12 @@ const actions = {
   'fetch.hrd.gaps'({commit}, q) {
     let url = `${process.env.VUE_APP_API}/archives/hrd/gaps/?${$.param(q)}`
     return fetchData(url, commit, "hrd.gaps")
+  },
+  'fetch.requests.status'() {
+    return fetchBasic(`${process.env.VUE_APP_API}/requests/status/`)
+  },
+  'fetch.vmu.records'() {
+    return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/records/`)
   },
 }
 
