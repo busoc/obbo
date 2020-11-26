@@ -3,30 +3,35 @@
     <ul class="nav flex-column">
       <li class="nav-item">
         <router-link :to="{name: 'view.dashboard'}"  :class="['nav-link', {active: $route.name == 'view.dashboard'}]">
-          <span>Dashboard</span>
+          <i data-feather="home"></i>
+          <span class="px-2">Dashboard</span>
         </router-link>
       </li>
       <li class="nav-item">
         <router-link :to="{name: 'view.requests'}" :class="['nav-link', {active: $route.name == 'view.requests'}]">
-          <span>Requests</span>
+          <i data-feather="database"></i>
+          <span class="px-2">Requests</span>
           <span v-if="totalRequests" class="badge badge-primary float-right">{{totalRequests}}</span>
         </router-link>
       </li>
       <li class="nav-item">
         <router-link :to="{name: 'view.vmu.gaps'}"  :class="['nav-link', {active: $route.name == 'view.vmu.gaps'}]">
-          <span>VMU Gaps</span>
+          <i data-feather="archive"></i>
+          <span class="px-2">VMU Gaps</span>
           <span v-if="totalVMU" class="badge badge-primary float-right">{{totalVMU}}</span>
         </router-link>
       </li>
       <li class="nav-item">
         <router-link :to="{name: 'view.hrd.gaps'}"  :class="['nav-link', {active: $route.name == 'view.hrd.gaps'}]">
-          <span>HRD Gaps</span>
+          <i data-feather="archive" style="font-size: 12px"></i>
+          <span class="px-2">HRD Gaps</span>
           <span v-if="totalHRD" class="badge badge-primary float-right">{{totalHRD}}</span>
         </router-link>
       </li>
       <li class="nav-item">
         <router-link :to="{name: 'view.settings'}"  :class="['nav-link', {active: $route.name == 'view.settings'}]">
-          <span>Variables</span>
+          <i data-feather="settings"></i>
+          <span class="px-2">Variables</span>
         </router-link>
       </li>
     </ul>
@@ -34,6 +39,7 @@
 </template>
 
 <script>
+import feather from 'feather-icons'
 export default {
   name: "Menu",
   computed: {
@@ -46,6 +52,9 @@ export default {
     totalVMU() {
       return this.$store.getters.totalVMU
     },
+  },
+  mounted() {
+    feather.replace()
   },
 }
 </script>
@@ -64,10 +73,12 @@ export default {
   font-weight: 500;
   color: #333;
 }
+
 .sidebar-sticky .nav-link.active {
   color: #007bff;
 }
 .sidebar-sticky .nav-link:hover .feather {
   color: inherit;
 }
+
 </style>

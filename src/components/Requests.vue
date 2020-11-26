@@ -1,24 +1,34 @@
 <template>
   <div>
+    <router-view></router-view>
     <PageHeader :title="'Replay'"/>
-    <form class="form-inline my-3 px-3">
-      <label for="dtstart">Start Date</label>
-      <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
-      <label for="dtend">End Date</label>
-      <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
-      <label for="status">Status</label>
-      <select id="status" class="form-control form-control-sm mx-2">
-      </select>
-    </form>
+    <div class="d-flex justify-content-between my-3 px-3">
+      <form class="form-inline">
+        <label for="dtstart">Start Date</label>
+        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
+        <label for="dtend">End Date</label>
+        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <label for="status">Status</label>
+        <select id="status" class="form-control form-control-sm mx-2">
+        </select>
+        <label for="mode">Mode</label>
+        <select id="mode" class="form-control form-control-sm mx-2">
+          <option value=""></option>
+          <option value="automatic">automatic</option>
+          <option value="manual">manual</option>
+        </select>
+      </form>
+      <SortBy :values="['time', 'date', 'status', 'priority', 'automatic']" :empty="true"/>
+    </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
         <tr>
-          <th>Time</th>
-          <th class="text-center">Status</th>
-          <th>Starts</th>
-          <th>Ends</th>
-          <th class="text-center">Priority</th>
-          <th>Comment</th>
+          <th class="text-capitalize">Time</th>
+          <th class="text-center text-capitalize">Status</th>
+          <th class="text-capitalize">Starts</th>
+          <th class="text-capitalize">Ends</th>
+          <th class="text-center text-capitalize">Priority</th>
+          <th class="text-center text-capitalize">Automatic</th>
           <th></th>
         </tr>
       </thead>
@@ -29,13 +39,15 @@
           <td>{{r.dtstart}}</td>
           <td>{{r.dtend}}</td>
           <td class="text-center">{{r.priority == -1 ? '-' : r.priority}}</td>
-          <td>{{r.comment || '-'}}</td>
+          <td class="text-center">
+            <i v-if="r.automatic" data-feather="award"></i>
+          </td>
           <td class="text-right">
-            <router-link :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-secondary btn-sm mx-2">
-              <span>view</span>
+            <router-link title="view request detail" :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
+              <i data-feather="edit"></i>
             </router-link>
-            <router-link :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-2">
-              <span>cancel</span>
+            <router-link title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
+              <i data-feather="trash-2"></i>
             </router-link>
           </td>
         </tr>
@@ -45,20 +57,22 @@
 </template>
 
 <script>
+import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
+import SortBy from './SortBy.vue'
 
 export default {
   name: "Requests",
   beforeRouteEnter (to, from, next) {
     next(vm => vm.fetch())
   },
-  mounted() {
-    this.fetch()
+  updated() {
+    feather.replace()
   },
   computed: {
     requests() {
       return this.$store.state.requests
-    }
+    },
   },
   methods: {
     fetch() {
@@ -67,6 +81,7 @@ export default {
   },
   components: {
     PageHeader,
+    SortBy,
   },
 }
 </script>

@@ -2,7 +2,13 @@ body {
   font-size: .875rem;
 }
 
-.obbo-heading {
-  font-size: 1.15rem;
-  text-transform: uppercase;
+.btn .feather,
+.table td .feather {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
