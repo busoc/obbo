@@ -5,22 +5,16 @@
     <div class="d-flex justify-content-between my-3 px-3">
       <form class="form-inline filter-form">
         <label for="dtstart">Start Date</label>
-        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
+        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
         <label for="dtend">End Date</label>
-        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
         <label for="status">Status</label>
-        <select id="status" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="status" id="status" class="form-control form-control-sm mx-2">
           <option></option>
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
-        <label for="mode">Mode</label>
-        <select id="mode" class="form-control form-control-sm mx-2">
-          <option value=""></option>
-          <option value="automatic" class="text-capitalize">automatic</option>
-          <option value="manual" class="text-capitalize">manual</option>
-        </select>
       </form>
-      <SortBy :values="['time', 'date', 'status', 'priority', 'automatic']"
+      <SortBy :values="['time', 'status', 'priority', 'automatic']"
         :empty="true"
         :field="field"
         @update:field="field = $event"
@@ -64,6 +58,7 @@
 </template>
 
 <script>
+import {DateTime} from 'luxon'
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
@@ -79,6 +74,9 @@ export default {
       field: "",
       order: "",
       statuslist: [],
+      dtstart: "",
+      dtend: "",
+      status: "",
     }
   },
   updated() {
@@ -91,7 +89,20 @@ export default {
   },
   methods: {
     fetch() {
-      this.$store.dispatch('fetch.requests')
+      let start = DateTime.fromISO(this.dtstart)
+      let end = DateTime.fromISO(this.dtend)
+      let q = {
+        status: this.status,
+        dtstart: "",
+        dtend: "",
+      }
+      if (start.isValid) {
+        q.dtstart = start.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      }
+      if (end.isValid) {
+        q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      }
+      this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
     },
     orderData() {

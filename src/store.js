@@ -31,13 +31,13 @@ const getters = {
     return state.status.hrd ? state.status.hrd.size : 0
   },
   totalRequests(state) {
-    return state.requests ? state.requests.length : 0
+    return state.status.requests ? state.status.requests.count : 0
   },
   totalHRD(state) {
-    return state.status.hrd ? state.status.hrd.gap : 0
+    return state.status.hrd ? state.status.hrd.count : 0
   },
   totalVMU(state) {
-    return state.status.vmu ? state.status.vmu.gap : 0
+    return state.status.vmu ? state.status.vmu.count : 0
   }
 }
 
