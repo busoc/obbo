@@ -10,6 +10,8 @@
         <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
         <label for="record">Record</label>
         <select @change="fetch" v-model="record" id="record" class="form-control form-control-sm mx-2">
+          <option value=""></option>
+          <option v-for="r in recordlist" :key="r.record">{{r.record}}</option>
         </select>
         <label for="source">Source</label>
         <select @change="fetch" v-model="source" id="source" class="form-control form-control-sm mx-2">
@@ -61,6 +63,7 @@ import {DateTime} from 'luxon'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
+import _ from 'lodash'
 
 export default {
   name: "VmuGap",
@@ -81,6 +84,7 @@ export default {
       dtend: "",
       source: "",
       record: "",
+      recordlist: [],
     }
   },
   updated() {
@@ -120,6 +124,7 @@ export default {
         q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
       }
       this.$store.dispatch('fetch.vmu.gaps', q)
+      this.$store.dispatch('fetch.vmu.records').then(list => {this.recordlist = _.sortBy(list, 'record') })
     },
     orderData() {
       return this.$store.getters.sortGapsVMU(this.field, this.order)
