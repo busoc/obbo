@@ -5,14 +5,14 @@
     <div class="d-flex justify-content-between my-3 px-3">
       <form class="form-inline filter-form">
         <label for="dtstart">Start Date</label>
-        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
+        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
         <label for="dtend">End Date</label>
-        <input type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
         <label for="record">Record</label>
-        <select id="record" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="record" id="record" class="form-control form-control-sm mx-2">
         </select>
         <label for="source">Source</label>
-        <select id="source" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="source" id="source" class="form-control form-control-sm mx-2">
         </select>
       </form>
       <SortBy :values="['time', 'record', 'source', 'date', 'missing']"
@@ -57,6 +57,7 @@
 </template>
 
 <script>
+import {DateTime} from 'luxon'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
@@ -64,12 +65,22 @@ import SortBy from './SortBy.vue'
 export default {
   name: "VmuGap",
   beforeRouteEnter (to, from, next) {
-    next(vm => vm.fetch())
+    next(vm => {
+      vm.load()
+      vm.fetch()
+    })
+  },
+  beforeRouteLeave() {
+    this.save()
   },
   data() {
     return {
       field: "",
       order: "",
+      dtstart: "",
+      dtend: "",
+      source: "",
+      record: "",
     }
   },
   updated() {
@@ -81,8 +92,34 @@ export default {
     },
   },
   methods: {
+    load() {
+      this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
+      this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
+      this.source = localStorage["filter.source"] ? JSON.parse(localStorage["filter.source"]) : ""
+      this.channel = localStorage["filter.record"] ? JSON.parse(localStorage["filter.record"]) : ""
+    },
+    save() {
+      localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
+      localStorage.setItem("filter.dtend", JSON.stringify(this.dtend))
+      localStorage.setItem("filter.source", JSON.stringify(this.source))
+      localStorage.setItem("filter.record", JSON.stringify(this.record))
+    },
     fetch() {
-      this.$store.dispatch('fetch.vmu.gaps')
+      let start = DateTime.fromISO(this.dtstart)
+      let end = DateTime.fromISO(this.dtend)
+      let q = {
+        source: this.source,
+        record: this.record,
+        dtstart: "",
+        dtend: "",
+      }
+      if (start.isValid) {
+        q.dtstart = start.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      }
+      if (end.isValid) {
+        q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      }
+      this.$store.dispatch('fetch.vmu.gaps', q)
     },
     orderData() {
       return this.$store.getters.sortGapsVMU(this.field, this.order)

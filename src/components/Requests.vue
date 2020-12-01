@@ -44,9 +44,9 @@
             <i v-if="r.automatic" data-feather="award"></i>
           </td>
           <td class="text-right">
-            <router-link title="view request detail" :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
+            <!-- <router-link title="view request detail" :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
-            </router-link>
+            </router-link> -->
             <router-link title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
               <i data-feather="trash-2"></i>
             </router-link>
@@ -67,7 +67,13 @@ import SortBy from './SortBy.vue'
 export default {
   name: "Requests",
   beforeRouteEnter (to, from, next) {
-    next(vm => vm.fetch())
+    next(vm => {
+      vm.load()
+      vm.fetch()
+    })
+  },
+  beforeRouteLeave() {
+    this.save()
   },
   data() {
     return {
@@ -88,6 +94,16 @@ export default {
     },
   },
   methods: {
+    load() {
+      this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
+      this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
+      this.status = localStorage["filter.status"] ? JSON.parse(localStorage["filter.status"]) : ""
+    },
+    save() {
+      localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
+      localStorage.setItem("filter.dtend", JSON.stringify(this.dtend))
+      localStorage.setItem("filter.status", JSON.stringify(this.status))
+    },
     fetch() {
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
