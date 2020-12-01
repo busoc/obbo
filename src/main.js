@@ -3,6 +3,7 @@ import App from './App.vue'
 import Autobrm from './components/Autobrm.vue'
 import Requests from './components/Requests.vue'
 import NewRequest from './components/NewRequest.vue'
+import EditVariable from './components/EditVariable.vue'
 import VmuGap from './components/VmuGap.vue'
 import HrdGap from './components/HrdGap.vue'
 import Config from './components/Config.vue'
@@ -46,8 +47,14 @@ const routes = [
         ],
       },
       {path: '/archives/hrd/:id', name: 'view.hrd.detail', component: HrdGapDetail},
-      {path: '/settings/', name: 'view.settings', component: Config},
-      {path: '/settings/:id', name: 'view.variable'},
+      {
+        path: '/settings/',
+        name: 'view.settings',
+        component: Config,
+        children: [
+          {path: '/settings/:id', name: 'edit.variable', component: EditVariable},
+        ],
+      },
     ],
   },
 ]

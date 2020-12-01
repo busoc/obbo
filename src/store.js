@@ -24,6 +24,10 @@ const getters = {
   sortGapsHRD: (state) => (field, order) => {
     return orderArray(state.hrdgaps, field, order)
   },
+  variable: (state) => (id) => {
+    let i = state.config.findIndex(v => v.id == id)
+    return i < 0 ? {} : state.config[i]
+  },
   totalSize(state) {
     return state.status.hrd ? state.status.hrd.gap : 0
   },
@@ -104,6 +108,22 @@ const actions = {
   },
   'fetch.vmu.records'() {
     return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/records/`)
+  },
+  'register.request'(_, data) {
+    return fetch(`${process.env.VUE_APP_API}/requests/`, {headers, method: 'POST', body: JSON.stringify(data)}).then(rs => {
+      if (!rs.ok) {
+        return Promise.reject(rs.statusText)
+      }
+      return Promise.resolve(data)
+    })
+  },
+  'update.variable'(_, {id, data}) {
+    return fetch(`${process.env.VUE_APP_API}/config/${id}`, {headers, method: 'PUT', body: JSON.stringify(data)}).then(rs => {
+      if (!rs.ok) {
+        return Promise.reject(rs.statusText)
+      }
+      return Promise.resolve(data)
+    })
   },
 }
 

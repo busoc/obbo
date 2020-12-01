@@ -1,5 +1,6 @@
 <template>
   <div>
+    <router-view></router-view>
     <PageHeader :title="'settings'"/>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -16,7 +17,7 @@
           <td class="text-center">{{v.type || "-"}}</td>
           <td>{{v.value}}</td>
           <td class="text-right">
-            <router-link :to="{name: 'view.variable', params:{id: v.id}}" class="btn btn-primary btn-sm mx-2">
+            <router-link :to="{name: 'edit.variable', params:{id: v.id}}" class="btn btn-primary btn-sm mx-2">
               <i data-feather="edit"></i>
             </router-link>
           </td>
@@ -39,6 +40,9 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => vm.fetch())
+  },
+  beforeRouteUpdate() {
+    this.fetch()
   },
   updated() {
     feather.replace()

@@ -43,9 +43,9 @@
           <td>{{g.dtend}}</td>
           <td class="text-center">{{g.last - g.first}}</td>
           <td class="text-right">
-            <router-link :to="{name: 'view.vmu.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
+            <!-- <router-link :to="{name: 'view.vmu.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
-            </router-link>
+            </router-link> -->
             <router-link title="create request" :to="{name: 'vmu.new.request', params: {id: g.id}, query: {dtstart: g.dtstart, dtend: g.dtend}}" class="btn btn-secondary btn-sm mx-1">
               <i data-feather="plus-square"></i>
             </router-link>
