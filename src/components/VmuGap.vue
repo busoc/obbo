@@ -104,6 +104,11 @@ export default {
       this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
       this.source = localStorage["filter.source"] ? JSON.parse(localStorage["filter.source"]) : ""
       this.channel = localStorage["filter.record"] ? JSON.parse(localStorage["filter.record"]) : ""
+
+      let field = `sort.${this.$route.name}.field`
+      let order = `sort.${this.$route.name}.order`
+      this.field = localStorage[field] ? JSON.parse(localStorage[field]) : ""
+      this.order = localStorage[order] ? JSON.parse(localStorage[order]) : ""
     },
     save() {
       localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))

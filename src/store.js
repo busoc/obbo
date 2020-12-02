@@ -123,6 +123,14 @@ const actions = {
       return Promise.resolve(data)
     })
   },
+  'cancel.request'(_, {id, comment}) {
+    return fetch(`${process.env.VUE_APP_API}/requests/${id}`, {headers, method: 'POST', body: JSON.stringify({comment})}).then(rs => {
+      if (!rs.ok) {
+        return Promise.reject(rs.statusText)
+      }
+      return Promise.resolve("")
+    })
+  },
   'update.variable'(_, {id, data}) {
     return fetch(`${process.env.VUE_APP_API}/config/${id}`, {headers, method: 'PUT', body: JSON.stringify(data)}).then(rs => {
       if (!rs.ok) {

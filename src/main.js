@@ -3,6 +3,7 @@ import App from './App.vue'
 import Autobrm from './components/Autobrm.vue'
 import Requests from './components/Requests.vue'
 import NewRequest from './components/NewRequest.vue'
+import CancelRequest from './components/CancelRequest.vue'
 import EditVariable from './components/EditVariable.vue'
 import VmuGap from './components/VmuGap.vue'
 import HrdGap from './components/HrdGap.vue'
@@ -28,7 +29,7 @@ const routes = [
       {path: '/new', name:'new.request', component: NewRequest},
       {path: '/requests/', name: 'view.requests', component: Requests},
       {path: '/requests/:id', name: 'view.request.detail', component: RequestDetail},
-      {path: '/requests/:id/cancel', name: 'view.request.cancel'},
+      {path: '/requests/:id/cancel', name: 'view.request.cancel', component: CancelRequest},
       {
         path: '/archives/vmu',
         name: 'view.vmu.gaps',
