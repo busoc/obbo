@@ -63,7 +63,8 @@ import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
 import _ from 'lodash'
-import {MaxDays, MaxMessage, IsoFormat, Periods} from './intervals.js'
+// import {MaxDays, MaxMessage, IsoFormat, Periods} from './intervals.js'
+import {IsoFormat, RFC3339, Periods} from './intervals.js'
 
 export default {
   name: "HrdGap",
@@ -122,21 +123,21 @@ export default {
         dtend: "",
       }
       if (start.isValid) {
-        q.dtstart = start.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+        q.dtstart = start.toFormat(RFC3339)
       }
       if (end.isValid) {
-        q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+        q.dtend = end.toFormat(RFC3339)
       }
       if (start.isValid && end.isValid) {
         if (end < start) {
           return
         }
-        let diff = end.diff(start, 'days').toObject()
-        if (diff.days >= MaxDays) {
-          if (!confirm(MaxMessage)) {
-            return
-          }
-        }
+        // let diff = end.diff(start, 'days').toObject()
+        // if (diff.days >= MaxDays) {
+        //   if (!confirm(MaxMessage)) {
+        //     return
+        //   }
+        // }
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
@@ -153,6 +154,7 @@ export default {
 
       this.dtstart = start.toFormat(IsoFormat)
       this.dtend = end.toFormat(IsoFormat)
+      this.fetch()
     },
     formatDuration(d) {
       return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`

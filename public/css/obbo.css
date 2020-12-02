@@ -14,7 +14,7 @@ body {
 }
 
 form.filter-form input[type=datetime-local] {
-  width: 210px;
+  width: 235px;
 }
 
 form.filter-form select {

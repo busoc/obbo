@@ -67,7 +67,8 @@ import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
-import {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods} from './intervals.js'
+// import {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods} from './intervals.js'
+import {IsoFormat, RFC3339, Periods} from './intervals.js'
 
 export default {
   name: "Requests",
@@ -135,12 +136,12 @@ export default {
         if (end < start) {
           return
         }
-        let diff = end.diff(start, 'days').toObject()
-        if (diff.days >= MaxDays) {
-          if (!confirm(MaxMessage)) {
-            return
-          }
-        }
+        // let diff = end.diff(start, 'days').toObject()
+        // if (diff.days >= MaxDays) {
+        //   if (!confirm(MaxMessage)) {
+        //     return
+        //   }
+        // }
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
@@ -157,6 +158,8 @@ export default {
 
       this.dtstart = start.toFormat(IsoFormat)
       this.dtend = end.toFormat(IsoFormat)
+
+      this.fetch()
     },
     formatDuration(d) {
       return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
