@@ -4,17 +4,21 @@
     <PageHeader :title="'VMU Gaps'"/>
     <div class="d-flex justify-content-between my-3 px-3">
       <form class="form-inline filter-form">
-        <label for="dtstart">Start Date</label>
-        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
-        <label for="dtend">End Date</label>
-        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <label for="period">Period</label>
+        <select v-model="duration" @change="updateRange" id="period" class="form-control form-control-sm mx-1">
+          <option></option>
+          <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
+        </select>
+        <label for="dtstart">Range</label>
+        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
+        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="record">Record</label>
-        <select @change="fetch" v-model="record" id="record" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="record" id="record" class="form-control form-control-sm mx-1">
           <option value=""></option>
           <option v-for="r in recordlist" :key="r.record" :value="r.record">{{r.record}}</option>
         </select>
         <label for="source">Source</label>
-        <select @change="fetch" v-model="source" id="source" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="source" id="source" class="form-control form-control-sm mx-1">
           <option value=""></option>
           <option v-for="s in sourcelist" :key="s.source" :value="s.source">0x{{s.source}}</option>
         </select>
@@ -61,11 +65,12 @@
 </template>
 
 <script>
-import {DateTime} from 'luxon'
+import {DateTime, Duration} from 'luxon'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
 import _ from 'lodash'
+import {MaxDays, MaxMessage, Periods, IsoFormat} from './intervals.js'
 
 export default {
   name: "VmuGap",
@@ -88,6 +93,8 @@ export default {
       record: "",
       recordlist: [],
       sourcelist: [],
+      periods: Periods,
+      duration: "",
     }
   },
   updated() {
@@ -132,12 +139,36 @@ export default {
       if (end.isValid) {
         q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
       }
+      if (start.isValid && end.isValid) {
+        if (end < start) {
+          return
+        }
+        let diff = end.diff(start, 'days').toObject()
+        if (diff.days >= MaxDays) {
+          if (!confirm(MaxMessage)) {
+            return
+          }
+        }
+      }
       this.$store.dispatch('fetch.vmu.gaps', q)
       this.$store.dispatch('fetch.vmu.records').then(list => {this.recordlist = _.sortBy(list, 'record') })
       this.$store.dispatch('fetch.vmu.sources').then(list => {this.sourcelist = _.sortBy(list, 'source') })
     },
     orderData() {
       return this.$store.getters.sortGapsVMU(this.field, this.order)
+    },
+    updateRange() {
+      if (!this.duration) {
+        return
+      }
+      let end = DateTime.local()
+      let start = end.minus(Duration.fromISO(this.duration))
+
+      this.dtstart = start.toFormat(IsoFormat)
+      this.dtend = end.toFormat(IsoFormat)
+    },
+    formatDuration(d) {
+      return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
     },
   },
   components: {

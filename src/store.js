@@ -2,8 +2,18 @@ import $ from 'jquery'
 import _ from 'lodash'
 import {createStore} from 'vuex'
 
+const autobrm = {
+  cmdline: "N/A",
+  pid: "N/A",
+  state: "N/A",
+  vmrss: "N/A",
+  vmsize: "N/A",
+}
+
 const state = {
-  status: {},
+  status: {
+    autobrm
+  },
   requests: [],
   vmugaps: [],
   hrdgaps: [],
@@ -42,7 +52,10 @@ const getters = {
   },
   totalVMU(state) {
     return state.status.vmu ? state.status.vmu.count : 0
-  }
+  },
+  autobrm(state) {
+    return state.status.autobrm
+  },
 }
 
 const mutations = {

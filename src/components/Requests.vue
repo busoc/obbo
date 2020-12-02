@@ -4,12 +4,16 @@
     <PageHeader :title="'Replay'"/>
     <div class="d-flex justify-content-between my-3 px-3">
       <form class="form-inline filter-form">
-        <label for="dtstart">Start Date</label>
-        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
-        <label for="dtend">End Date</label>
-        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <label for="period">Period</label>
+        <select v-model="duration" @change="updateRange" id="period" class="form-control form-control-sm mx-1">
+          <option></option>
+          <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
+        </select>
+        <label>Range</label>
+        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
+        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="status">Status</label>
-        <select @change="fetch" v-model="status" id="status" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="status" id="status" class="form-control form-control-sm mx-1">
           <option></option>
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
@@ -47,7 +51,7 @@
             <!-- <router-link title="view request detail" :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
             </router-link> -->
-            <router-link title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
+            <router-link v-if="r.cancellable" title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
               <i data-feather="trash-2"></i>
             </router-link>
           </td>
@@ -58,11 +62,12 @@
 </template>
 
 <script>
-import {DateTime} from 'luxon'
+import {DateTime, Duration} from 'luxon'
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
+import {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods} from './intervals.js'
 
 export default {
   name: "Requests",
@@ -83,6 +88,8 @@ export default {
       dtstart: "",
       dtend: "",
       status: "",
+      duration: "",
+      periods: Periods,
     }
   },
   updated() {
@@ -119,17 +126,41 @@ export default {
         dtend: "",
       }
       if (start.isValid) {
-        q.dtstart = start.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+        q.dtstart = start.toFormat(RFC3339)
       }
       if (end.isValid) {
-        q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+        q.dtend = end.toFormat(RFC3339)
+      }
+      if (start.isValid && end.isValid) {
+        if (end < start) {
+          return
+        }
+        let diff = end.diff(start, 'days').toObject()
+        if (diff.days >= MaxDays) {
+          if (!confirm(MaxMessage)) {
+            return
+          }
+        }
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
     },
     orderData() {
       return this.$store.getters.sortRequests(this.field, this.order)
-    }
+    },
+    updateRange() {
+      if (!this.duration) {
+        return
+      }
+      let end = DateTime.local()
+      let start = end.minus(Duration.fromISO(this.duration))
+
+      this.dtstart = start.toFormat(IsoFormat)
+      this.dtend = end.toFormat(IsoFormat)
+    },
+    formatDuration(d) {
+      return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
+    },
   },
   components: {
     PageHeader,

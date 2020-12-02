@@ -10,27 +10,23 @@
           <tbody>
             <tr>
               <th>Command</th>
-              <td class="text-right"></td>
+              <td class="text-right">{{autobrm.cmdline}}</td>
             </tr>
             <tr>
               <th>PID</th>
-              <td class="text-right"></td>
+              <td class="text-right">{{autobrm.pid}}</td>
             </tr>
             <tr>
               <th>State</th>
-              <td class="text-right"></td>
+              <td class="text-right">{{autobrm.state}}</td>
             </tr>
             <tr>
-              <th>Time</th>
-              <td class="text-right"></td>
+              <th>Resident Set Size</th>
+              <td class="text-right">{{autobrm.vmrss}}</td>
             </tr>
             <tr>
-              <th>Priority</th>
-              <td class="text-right"></td>
-            </tr>
-            <tr>
-              <th>RSS</th>
-              <td class="text-right"></td>
+              <th>Virtual Memory</th>
+              <td class="text-right">{{autobrm.vmsize}}</td>
             </tr>
           </tbody>
         </table>
@@ -53,6 +49,11 @@ export default {
     return {
       prev: undefined,
     }
+  },
+  computed: {
+    autobrm() {
+      return this.$store.getters.autobrm || {}
+    },
   },
   methods: {
     toggle() {

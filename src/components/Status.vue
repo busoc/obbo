@@ -2,16 +2,16 @@
   <div class="col-md-12 col-lg-12 d-md-block bg-light px-3 py-2 border-top border-right bg-light">
     <h6>status</h6>
     <dl class="row">
-      <dt class="col-3">autobrm status</dt>
-      <dd class="col-9 text-right">{{state.autobrm}}</dd>
+      <dt class="col-3">status</dt>
+      <dd class="col-9 text-right">{{autobrm.state}}</dd>
       <dt class="col-3">number gaps</dt>
-      <dd class="col-9 text-right">{{total}}</dd>
+      <dd class="col-9 text-right"></dd>
       <dt class="col-3">gaps duration</dt>
-      <dd class="col-9 text-right">47h45min13sec</dd>
+      <dd class="col-9 text-right"></dd>
       <dt class="col-3">incoming requests</dt>
-      <dd class="col-9 text-right">143</dd>
+      <dd class="col-9 text-right"></dd>
       <dt class="col-3">consolidate size</dt>
-      <dd class="col-9 text-right">{{size}}</dd>
+      <dd class="col-9 text-right"></dd>
     </dl>
   </div>
 </template>
@@ -20,15 +20,9 @@
 export default {
   name: "Status",
   computed: {
-    state() {
-      return this.$store.state.status
+    autobrm() {
+      return this.$store.getters.autobrm || {}
     },
-    total() {
-      return this.$store.getters.totalGap
-    },
-    size() {
-      return this.$store.getters.totalSize
-    }
   },
 }
 </script>

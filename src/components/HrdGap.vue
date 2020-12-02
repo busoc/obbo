@@ -4,12 +4,16 @@
     <PageHeader :title="'HRD Gaps'"/>
     <div class="d-flex justify-content-between my-3 px-3">
       <form class="form-inline filter-form">
-        <label for="dtstart">Start Date</label>
-        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-2" id="dtstart"/>
-        <label for="dtend">End Date</label>
-        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
+        <label for="period">Period</label>
+        <select v-model="duration" @change="updateRange" id="period" class="form-control form-control-sm mx-1">
+          <option></option>
+          <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
+        </select>
+        <label>Range</label>
+        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
+        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="channel">Channel</label>
-        <select @change="fetch" v-model="channel" id="channel" class="form-control form-control-sm mx-2">
+        <select @change="fetch" v-model="channel" id="channel" class="form-control form-control-sm mx-1">
           <option value=""></option>
           <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
@@ -54,11 +58,12 @@
 </template>
 
 <script>
-import {DateTime} from 'luxon'
+import {DateTime, Duration} from 'luxon'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
 import _ from 'lodash'
+import {MaxDays, MaxMessage, IsoFormat, Periods} from './intervals.js'
 
 export default {
   name: "HrdGap",
@@ -82,6 +87,8 @@ export default {
       dtend: "",
       channel: "",
       channellist: [],
+      periods: Periods,
+      duration: "",
     }
   },
   computed: {
@@ -120,11 +127,35 @@ export default {
       if (end.isValid) {
         q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
       }
+      if (start.isValid && end.isValid) {
+        if (end < start) {
+          return
+        }
+        let diff = end.diff(start, 'days').toObject()
+        if (diff.days >= MaxDays) {
+          if (!confirm(MaxMessage)) {
+            return
+          }
+        }
+      }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
     },
     orderData() {
       return this.$store.getters.sortGapsHRD(this.field, this.order)
+    },
+    updateRange() {
+      if (!this.duration) {
+        return
+      }
+      let end = DateTime.local()
+      let start = end.minus(Duration.fromISO(this.duration))
+
+      this.dtstart = start.toFormat(IsoFormat)
+      this.dtend = end.toFormat(IsoFormat)
+    },
+    formatDuration(d) {
+      return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
     },
   },
   components: {
