@@ -10,6 +10,8 @@
         <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-2" id="dtend"/>
         <label for="channel">Channel</label>
         <select @change="fetch" v-model="channel" id="channel" class="form-control form-control-sm mx-2">
+          <option value=""></option>
+          <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
       </form>
       <SortBy :values="['time', 'channel', 'date', 'missing']"
@@ -56,6 +58,7 @@ import {DateTime} from 'luxon'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
+import _ from 'lodash'
 
 export default {
   name: "HrdGap",
@@ -78,6 +81,7 @@ export default {
       dtstart: "",
       dtend: "",
       channel: "",
+      channellist: [],
     }
   },
   computed: {
@@ -97,6 +101,7 @@ export default {
       localStorage.setItem("filter.channel", JSON.stringify(this.channel))
     },
     fetch() {
+      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {
@@ -111,6 +116,7 @@ export default {
         q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
+      this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
     },
     orderData() {
       return this.$store.getters.sortGapsHRD(this.field, this.order)

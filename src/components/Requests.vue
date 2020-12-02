@@ -105,6 +105,7 @@ export default {
       localStorage.setItem("filter.status", JSON.stringify(this.status))
     },
     fetch() {
+      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {

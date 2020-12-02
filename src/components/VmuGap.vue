@@ -11,10 +11,12 @@
         <label for="record">Record</label>
         <select @change="fetch" v-model="record" id="record" class="form-control form-control-sm mx-2">
           <option value=""></option>
-          <option v-for="r in recordlist" :key="r.record">{{r.record}}</option>
+          <option v-for="r in recordlist" :key="r.record" :value="r.record">{{r.record}}</option>
         </select>
         <label for="source">Source</label>
         <select @change="fetch" v-model="source" id="source" class="form-control form-control-sm mx-2">
+          <option value=""></option>
+          <option v-for="s in sourcelist" :key="s.source" :value="s.source">0x{{s.source}}</option>
         </select>
       </form>
       <SortBy :values="['time', 'record', 'source', 'date', 'missing']"
@@ -85,6 +87,7 @@ export default {
       source: "",
       record: "",
       recordlist: [],
+      sourcelist: [],
     }
   },
   updated() {
@@ -109,6 +112,7 @@ export default {
       localStorage.setItem("filter.record", JSON.stringify(this.record))
     },
     fetch() {
+      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {
@@ -125,6 +129,7 @@ export default {
       }
       this.$store.dispatch('fetch.vmu.gaps', q)
       this.$store.dispatch('fetch.vmu.records').then(list => {this.recordlist = _.sortBy(list, 'record') })
+      this.$store.dispatch('fetch.vmu.sources').then(list => {this.sourcelist = _.sortBy(list, 'source') })
     },
     orderData() {
       return this.$store.getters.sortGapsVMU(this.field, this.order)

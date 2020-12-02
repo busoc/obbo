@@ -109,6 +109,12 @@ const actions = {
   'fetch.vmu.records'() {
     return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/records/`)
   },
+  'fetch.vmu.sources'() {
+    return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/sources/`)
+  },
+  'fetch.hrd.channels'() {
+    return fetchBasic(`${process.env.VUE_APP_API}/archives/hrd/channels/`)
+  },
   'register.request'(_, data) {
     return fetch(`${process.env.VUE_APP_API}/requests/`, {headers, method: 'POST', body: JSON.stringify(data)}).then(rs => {
       if (!rs.ok) {
