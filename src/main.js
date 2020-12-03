@@ -11,16 +11,19 @@ import Config from './components/Config.vue'
 import RequestDetail from './components/RequestDetail.vue'
 import VmuGapDetail from './components/VmuGapDetail.vue'
 import HrdGapDetail from './components/HrdGapDetail.vue'
+import Dashboard from './components/Dashboard.vue'
 import store from './store.js'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
     path: '/',
-    name: 'view.dashboard',
+    name: 'view.index',
     component: App,
+    redirect: {name: 'view.dashboard'},
     children: [
       {path: '/autobrm', name:'view.autobrm', component: Autobrm},
+      {path: '/dashboard', name:'view.dashboard', component: Dashboard},
       {
         path: '/requests/',
         name: 'view.requests',

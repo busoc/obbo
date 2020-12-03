@@ -119,6 +119,11 @@ const actions = {
   'fetch.requests.status'() {
     return fetchBasic(`${process.env.VUE_APP_API}/requests/status/`)
   },
+  'fetch.requests.stats'() {
+    return fetchBasic(`${process.env.VUE_APP_API}/stats/requests/`).then(list => {
+      return Promise.resolve(_.groupBy(list, 'status'))
+    })
+  },
   'fetch.vmu.records'() {
     return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/records/`)
   },

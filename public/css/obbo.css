@@ -20,3 +20,13 @@ form.filter-form input[type=datetime-local] {
 form.filter-form select {
   width: 160px;
 }
+
+.col {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+svg g.tick line {
+  stroke-dasharray: 5;
+  stroke-width: 0.15;
+}

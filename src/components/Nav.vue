@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <router-link class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" :to="{name: 'view.dashboard'}">
+    <router-link class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" :to="{name: 'view.index'}">
       <span>OBBO</span>
     </router-link>
     <ul class="navbar-nav">
