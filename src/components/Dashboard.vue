@@ -11,11 +11,18 @@
     </div>
     <div class="px-3 my-4">
       <div class="row">
-        <Lines :what="'pending'" :list="replays.PENDING"/>
-        <Lines :what="'running'" :list="replays.RUNNING"/>
+        <Lines :what="'replays-count'" :list="items.REPLAY" :field="'count'"/>
+        <Lines :what="'hrd-gaps'" :list="items.HRD" :field="'count'"/>
+        <Lines :what="'vmu-gaps'" :list="items.VMU" :field="'count'"/>
+      </div>
+    </div>
+    <div class="px-3 my-4">
+      <div class="row">
+        <Lines :what="'pending'" :list="replays.PENDING" :field="'count'"/>
+        <Lines :what="'running'" :list="replays.RUNNING" :field="'count'"/>
         <div class="w-100"></div>
-        <Lines :what="'completed'" :list="replays.COMPLETED"/>
-        <Lines :what="'cancelled'" :list="replays.CANCELLED"/>
+        <Lines :what="'completed'" :list="replays.COMPLETED" :field="'count'"/>
+        <Lines :what="'cancelled'" :list="replays.CANCELLED" :field="'count'"/>
       </div>
     </div>
     <div class="px-3 my-4">
@@ -47,11 +54,13 @@ export default {
   data() {
     return {
       replays: {},
+      items: {},
     }
   },
   methods: {
     fetch() {
       this.$store.dispatch('fetch.requests.stats').then(list => this.replays = Object.assign({}, list))
+      this.$store.dispatch('fetch.items.stats').then(list => this.items = Object.assign({}, list))
     },
   },
 }

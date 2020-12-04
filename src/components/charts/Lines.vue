@@ -14,10 +14,15 @@ import {margins, PreferredHeight} from './charts.js'
 
 export default {
   name: 'Lines',
-  props: ["what", "list", "noheader"],
+  props: {
+    what: String,
+    field: String,
+    list: Array,
+    noheader: Boolean,
+  },
   data() {
     let xscale = d3.scaleTime()
-    let xaxis = d3.axisBottom().scale(xscale).ticks(8)
+    let xaxis = d3.axisBottom().scale(xscale).ticks(5).tickFormat(d3.timeFormat("%Y/%j"))
     let yscale = d3.scaleLinear()
     let yaxis = d3.axisLeft().scale(yscale).ticks(8)
     return {
@@ -46,7 +51,7 @@ export default {
     }
     this.xscale.domain(d3.extent(this.list, d => DateTime.fromISO(d.time).toJSDate()))
     this.xaxis.scale(this.xscale)
-    this.yscale.domain([0, d3.max(this.list, d => d.count)])
+    this.yscale.domain([0, d3.max(this.list, d => d[this.field])])
     this.yaxis.scale(this.yscale).tickSize(-(this.width-margins.left-margins.right))
 
     let svg = d3.select(`#${this.what}`).select('svg')
