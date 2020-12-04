@@ -18,12 +18,16 @@ export default {
     field: String,
     list: Array,
     noheader: Boolean,
+    formatter: Function,
   },
   data() {
     let xscale = d3.scaleTime()
     let xaxis = d3.axisBottom().scale(xscale).ticks(5).tickFormat(d3.timeFormat("%Y/%j"))
     let yscale = d3.scaleLinear()
     let yaxis = d3.axisLeft().scale(yscale).ticks(8)
+    if (this.formatter) {
+      yaxis.tickFormat(this.formatter)
+    }
     return {
       width: 0,
       height: PreferredHeight,
@@ -84,7 +88,7 @@ export default {
 
       const line = d3.line()
         .x(d => this.xscale(DateTime.fromISO(d.time).toJSDate()))
-        .y(d => this.yscale(d.count))
+        .y(d => this.yscale(d[this.field]))
         .curve(d3.curveStep)
 
       svg.append('g')

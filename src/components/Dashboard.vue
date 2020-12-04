@@ -54,6 +54,7 @@
 
 <script>
 import _ from 'lodash'
+import {Duration} from 'luxon'
 import TinyStat from './TinyStat.vue'
 import PageHeader from './PageHeader.vue'
 import Lines from './charts/Lines.vue'
@@ -65,6 +66,11 @@ function toArray(values) {
       return {label: arr[0], list: arr[1]}
     })
     .value()
+}
+
+function formatDuration(d) {
+  let time = Duration.fromObject({seconds: d})
+  return time.toFormat("h'H'mm'.'ss")
 }
 
 export default {
@@ -85,6 +91,7 @@ export default {
         vmu: [],
         hrd: [],
       },
+      durationFormatter: formatDuration,
     }
   },
   methods: {
