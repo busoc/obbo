@@ -18,12 +18,7 @@
           <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
       </form>
-      <SortBy :values="['time', 'channel', 'date', 'missing']"
-        :empty="true"
-        :field="field"
-        @update:field="field = $event"
-        :order="order"
-        @update:order="order = $event"/>
+      <SortBy :fields="fields" @update:sort="sortData"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -63,8 +58,8 @@ import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
 import _ from 'lodash'
-// import {MaxDays, MaxMessage, IsoFormat, Periods} from './intervals.js'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
+import {hrdfields} from './sort.js'
 
 export default {
   name: "HrdGap",
@@ -82,8 +77,6 @@ export default {
   },
   data() {
     return {
-      field: "",
-      order: "",
       dtstart: "",
       dtend: "",
       channel: "",
@@ -96,17 +89,15 @@ export default {
     gaps() {
       return this.$store.state.hrdgaps
     },
+    fields() {
+      return hrdfields
+    }
   },
   methods: {
     load() {
       this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
       this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
       this.channel = localStorage["filter.channel"] ? JSON.parse(localStorage["filter.channel"]) : ""
-
-      let field = `sort.${this.$route.name}.field`
-      let order = `sort.${this.$route.name}.order`
-      this.field = localStorage[field] ? JSON.parse(localStorage[field]) : ""
-      this.order = localStorage[order] ? JSON.parse(localStorage[order]) : ""
     },
     save() {
       localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
@@ -132,18 +123,12 @@ export default {
         if (end < start) {
           return
         }
-        // let diff = end.diff(start, 'days').toObject()
-        // if (diff.days >= MaxDays) {
-        //   if (!confirm(MaxMessage)) {
-        //     return
-        //   }
-        // }
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
     },
-    orderData() {
-      return this.$store.getters.sortGapsHRD(this.field, this.order)
+    sortData(field, order) {
+      this.$store.commit('sort.hrd.gaps', {field, order})
     },
     updateRange() {
       if (!this.duration) {

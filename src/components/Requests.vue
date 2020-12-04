@@ -18,12 +18,7 @@
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
       </form>
-      <SortBy :values="['time', 'status', 'priority', 'automatic']"
-        :empty="true"
-        :field="field"
-        @update:field="field = $event"
-        :order="order"
-        @update:order="order = $event"/>
+      <SortBy :fields="fields" @update:sort="sortData"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -67,8 +62,8 @@ import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
-// import {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods} from './intervals.js'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
+import {repfields} from './sort.js'
 
 export default {
   name: "Requests",
@@ -83,8 +78,6 @@ export default {
   },
   data() {
     return {
-      field: "",
-      order: "",
       statuslist: [],
       dtstart: "",
       dtend: "",
@@ -98,7 +91,10 @@ export default {
   },
   computed: {
     requests() {
-      return this.orderData()
+      return this.$store.state.requests
+    },
+    fields() {
+      return repfields
     },
   },
   methods: {
@@ -106,11 +102,6 @@ export default {
       this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
       this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
       this.status = localStorage["filter.status"] ? JSON.parse(localStorage["filter.status"]) : ""
-
-      let field = `sort.${this.$route.name}.field`
-      let order = `sort.${this.$route.name}.order`
-      this.field = localStorage[field] ? JSON.parse(localStorage[field]) : ""
-      this.order = localStorage[order] ? JSON.parse(localStorage[order]) : ""
     },
     save() {
       localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
@@ -136,18 +127,12 @@ export default {
         if (end < start) {
           return
         }
-        // let diff = end.diff(start, 'days').toObject()
-        // if (diff.days >= MaxDays) {
-        //   if (!confirm(MaxMessage)) {
-        //     return
-        //   }
-        // }
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
     },
-    orderData() {
-      return this.$store.getters.sortRequests(this.field, this.order)
+    sortData(field, order) {
+      this.$store.commit('sort.requests', {field, order})
     },
     updateRange() {
       if (!this.duration) {

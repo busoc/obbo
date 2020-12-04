@@ -20,20 +20,7 @@ const state = {
   config:  [],
 }
 
-function orderArray(arr, field, order) {
-  return field ? _.orderBy(arr, field, order) : arr
-}
-
 const getters = {
-  sortRequests: (state) => (field, order) => {
-    return orderArray(state.requests, field, order)
-  },
-  sortGapsVMU: (state) => (field, order) => {
-    return orderArray(state.vmugaps, field, order)
-  },
-  sortGapsHRD: (state) => (field, order) => {
-    return orderArray(state.hrdgaps, field, order)
-  },
   variable: (state) => (id) => {
     let i = state.config.findIndex(v => v.id == id)
     return i < 0 ? {} : state.config[i]
@@ -58,7 +45,23 @@ const getters = {
   },
 }
 
+function orderArray(arr, field, order) {
+  if (!order) {
+    order = "asc"
+  }
+  return field ? _.orderBy(arr, field, order) : arr
+}
+
 const mutations = {
+  'sort.requests'(state, {field, order}) {
+    state.requests = orderArray(state.requests, field, order)
+  },
+  'sort.vmu.gaps'(state, {field, order}) {
+    state.vmugaps = orderArray(state.vmugaps, field, order)
+  },
+  'sort.hrd.gaps'(state, {field, order}) {
+    state.hrdgaps = orderArray(state.hrdgaps, field, order)
+  },
   'update.status'(state, status) {
     state.status = status
   },

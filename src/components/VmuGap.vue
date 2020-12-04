@@ -23,12 +23,7 @@
           <option v-for="s in sourcelist" :key="s.source" :value="s.source">0x{{s.source}}</option>
         </select>
       </form>
-      <SortBy :values="['time', 'record', 'source', 'date', 'missing']"
-        :empty="true"
-        :field="field"
-        @update:field="field = $event"
-        :order="order"
-        @update:order="order = $event"/>
+      <SortBy @update:sort="sortData"/>
     </div>
     <table class="table table-hover my-3">
       <thead class="thead-dark">
@@ -72,6 +67,7 @@ import SortBy from './SortBy.vue'
 import _ from 'lodash'
 // import {MaxDays, MaxMessage, Periods, IsoFormat} from './intervals.js'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
+import {vmufields} from './sort.js'
 
 export default {
   name: "VmuGap",
@@ -86,8 +82,6 @@ export default {
   },
   data() {
     return {
-      field: "",
-      order: "",
       dtstart: "",
       dtend: "",
       source: "",
@@ -103,7 +97,10 @@ export default {
   },
   computed: {
     gaps() {
-      return this.orderData()
+      return this.$store.state.vmugaps
+    },
+    fields() {
+      return vmufields
     },
   },
   methods: {
@@ -112,11 +109,6 @@ export default {
       this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
       this.source = localStorage["filter.source"] ? JSON.parse(localStorage["filter.source"]) : ""
       this.channel = localStorage["filter.record"] ? JSON.parse(localStorage["filter.record"]) : ""
-
-      let field = `sort.${this.$route.name}.field`
-      let order = `sort.${this.$route.name}.order`
-      this.field = localStorage[field] ? JSON.parse(localStorage[field]) : ""
-      this.order = localStorage[order] ? JSON.parse(localStorage[order]) : ""
     },
     save() {
       localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
@@ -144,19 +136,13 @@ export default {
         if (end < start) {
           return
         }
-        // let diff = end.diff(start, 'days').toObject()
-        // if (diff.days >= MaxDays) {
-        //   if (!confirm(MaxMessage)) {
-        //     return
-        //   }
-        // }
       }
       this.$store.dispatch('fetch.vmu.gaps', q)
       this.$store.dispatch('fetch.vmu.records').then(list => {this.recordlist = _.sortBy(list, 'record') })
       this.$store.dispatch('fetch.vmu.sources').then(list => {this.sourcelist = _.sortBy(list, 'source') })
     },
-    orderData() {
-      return this.$store.getters.sortGapsVMU(this.field, this.order)
+    sortData(field, order) {
+      this.$store.commit('sort.vmu.gaps', {field, order})
     },
     updateRange() {
       if (!this.duration) {

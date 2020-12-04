@@ -1,8 +1,10 @@
 const margins = {
-  left: 20,
+  left: 30,
   right: 10,
   top: 10,
   bottom: 25,
 }
 
-export {margins}
+const PreferredHeight = 240
+
+export {margins, PreferredHeight}

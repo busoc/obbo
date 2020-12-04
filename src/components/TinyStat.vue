@@ -4,9 +4,9 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h3 class="card-subtitle text-capitalize font-weight-light">{{title}}</h3>
-          <div class="trend d-flex align-items-center" v-if="curr.count">
-            <span :class="['mx-2', {'text-danger': diff >= 0, 'text-primary': diff < 0}]">{{curr.count}}</span>
-            <i v-if="diff >= 0" data-feather="trending-up"></i>
+          <div class="trend d-flex align-items-center">
+            <span :class="['mx-2', {'text-danger': diff > 0, 'text-primary': diff < 0}]">{{curr.count || 0}}</span>
+            <i v-if="diff > 0" data-feather="trending-up"></i>
             <i v-if="diff < 0" data-feather="trending-down"></i>
           </div>
         </div>
@@ -15,6 +15,7 @@
           <span class="mx-1">{{period.last ? period.last.time.toISODate() : ""}}</span>
           <span class="mx-1">{{period.sum}}</span>
         </small>
+        <small class="text-muted" v-else>no information available</small>
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@
 <script>
 import * as d3 from 'd3'
 import {DateTime} from 'luxon'
-import {margins} from './charts.js'
+import {margins, PreferredHeight} from './charts.js'
 
 export default {
   name: 'Lines',
@@ -22,7 +22,7 @@ export default {
     let yaxis = d3.axisLeft().scale(yscale).ticks(8)
     return {
       width: 0,
-      height: 240,
+      height: PreferredHeight,
       xscale,
       yscale,
       xaxis,
@@ -41,6 +41,9 @@ export default {
     this.yscale.rangeRound([this.height - margins.top - margins.bottom, 0])
   },
   updated() {
+    if (!this.list || this.list.length <= 1) {
+      return
+    }
     this.xscale.domain(d3.extent(this.list, d => DateTime.fromISO(d.time).toJSDate()))
     this.xaxis.scale(this.xscale)
     this.yscale.domain([0, d3.max(this.list, d => d.count)])
@@ -64,6 +67,7 @@ export default {
     const line = d3.line()
       .x(d => this.xscale(DateTime.fromISO(d.time).toJSDate()))
       .y(d => this.yscale(d.count))
+      .curve(d3.curveStep)
 
     svg.append('g')
       .attr('transform', `translate(${margins.left}, ${margins.top})`)
