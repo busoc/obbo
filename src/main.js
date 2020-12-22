@@ -8,9 +8,6 @@ import EditVariable from './components/EditVariable.vue'
 import VmuGap from './components/VmuGap.vue'
 import HrdGap from './components/HrdGap.vue'
 import Config from './components/Config.vue'
-import RequestDetail from './components/RequestDetail.vue'
-import VmuGapDetail from './components/VmuGapDetail.vue'
-import HrdGapDetail from './components/HrdGapDetail.vue'
 import Dashboard from './components/Dashboard.vue'
 import store from './store.js'
 import { createRouter, createWebHashHistory } from 'vue-router'
@@ -31,7 +28,6 @@ const routes = [
       },
       {path: '/new', name:'new.request', component: NewRequest},
       {path: '/requests/', name: 'view.requests', component: Requests},
-      {path: '/requests/:id', name: 'view.request.detail', component: RequestDetail},
       {path: '/requests/:id/cancel', name: 'view.request.cancel', component: CancelRequest},
       {
         path: '/archives/vmu',
@@ -41,7 +37,6 @@ const routes = [
           {path: '/archives/vmu/new', name:'vmu.new.request', component: NewRequest}
         ],
       },
-      {path: '/archives/vmu/:id', name: 'view.vmu.detail', component: VmuGapDetail},
       {
         path: '/archives/hrd',
         name: 'view.hrd.gaps',
@@ -50,7 +45,6 @@ const routes = [
           {path: '/archives/hrd/new', name:'hrd.new.request', component: NewRequest}
         ],
       },
-      {path: '/archives/hrd/:id', name: 'view.hrd.detail', component: HrdGapDetail},
       {
         path: '/settings/',
         name: 'view.settings',

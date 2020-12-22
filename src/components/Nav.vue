@@ -5,14 +5,19 @@
     </router-link>
     <ul class="navbar-nav">
       <li class="nav-item">
-        <router-link :to="{name: 'new.request'}" class="nav-link px-2 mx-1">
+        <router-link :to="{name: 'new.request'}" class="nav-link px-2 mx-1" title="register new request">
           <i data-feather="plus-square"></i>
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link :to="{name: 'view.autobrm'}" class="nav-link px-2 mx-1">
+        <router-link :to="{name: 'view.autobrm'}" class="nav-link px-2 mx-1" title="autobrm status">
           <i data-feather="cpu"></i>
         </router-link>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link px-2 mx-1" title="edit settings">
+          <i data-feather="code"></i>
+        </a>
       </li>
     </ul>
   </nav>

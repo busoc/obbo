@@ -10,10 +10,10 @@
           <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
         </select>
         <label>Range</label>
-        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
-        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
+        <input @change="fetch" v-model="criteria.dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
+        <input @change="fetch" v-model="criteria.dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="status">Status</label>
-        <select @change="fetch" v-model="status" id="status" class="form-control form-control-sm mx-1">
+        <select @change="fetch" v-model="criteria.status" id="status" class="form-control form-control-sm mx-1">
           <option></option>
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
@@ -53,6 +53,7 @@
         </tr>
       </tbody>
     </table>
+    <Paginate :query="query"/>
   </div>
 </template>
 
@@ -61,9 +62,16 @@ import {DateTime, Duration} from 'luxon'
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
-import SortBy from './SortBy.vue'
+import SortBy from './common/SortBy.vue'
+import Paginate from './common/Paginate.vue'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
 import {repfields} from './sort.js'
+
+const defaultCriteria = {
+  dtstart: "",
+  dtend: "",
+  status: "",
+}
 
 export default {
   name: "Requests",
@@ -72,11 +80,9 @@ export default {
   },
   data() {
     return {
-      statuslist: [],
-      dtstart: "",
-      dtend: "",
-      status: "",
+      criteria: defaultCriteria,
       duration: "",
+      statuslist: [],
       periods: Periods,
     }
   },
@@ -85,20 +91,34 @@ export default {
   },
   computed: {
     requests() {
-      return this.$store.state.requests
+      return this.$store.getters.objects
     },
     fields() {
       return repfields
     },
+    query() {
+      return {
+        status: this.criteria.status,
+        dtstart: this.criteria.dtstart,
+        dtend: this.criteria.dtend,
+      }
+    },
+  },
+  watch: {
+    $route() {
+      this.criteria = _.pick(this.$route.query, ["status", "dtstart", "dtend"])
+      this.fetch()
+    },
   },
   methods: {
     fetch() {
-      let start = DateTime.fromISO(this.dtstart)
-      let end = DateTime.fromISO(this.dtend)
+      let start = DateTime.fromISO(this.criteria.dtstart)
+      let end = DateTime.fromISO(this.criteria.dtend)
       let q = {
-        status: this.status,
+        status: this.criteria.status,
         dtstart: "",
         dtend: "",
+        page: this.$route.query.page ? this.$route.query.page : 1,
       }
       if (start.isValid) {
         q.dtstart = start.toFormat(RFC3339)
@@ -115,7 +135,7 @@ export default {
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
     },
     sortData(field, order) {
-      this.$store.commit('sort.requests', {field, order})
+      this.$store.commit('sort.data', {field, order})
     },
     updateRange() {
       if (!this.duration) {
@@ -124,8 +144,8 @@ export default {
       let end = DateTime.local()
       let start = end.minus(Duration.fromISO(this.duration))
 
-      this.dtstart = start.toFormat(IsoFormat)
-      this.dtend = end.toFormat(IsoFormat)
+      this.criteria.dtstart = start.toFormat(IsoFormat)
+      this.criteria.dtend = end.toFormat(IsoFormat)
 
       this.fetch()
     },
@@ -135,6 +155,7 @@ export default {
   },
   components: {
     PageHeader,
+    Paginate,
     SortBy,
   },
 }

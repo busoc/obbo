@@ -2,6 +2,8 @@ import $ from 'jquery'
 import _ from 'lodash'
 import {createStore} from 'vuex'
 
+const defaultLimit = 50
+
 const autobrm = {
   cmdline: "N/A",
   pid: "N/A",
@@ -18,6 +20,7 @@ const state = {
   vmugaps: [],
   hrdgaps: [],
   config:  [],
+  set: {},
 }
 
 const getters = {
@@ -43,6 +46,16 @@ const getters = {
   autobrm(state) {
     return state.status.autobrm
   },
+  objects(state) {
+    return state.set.data
+  },
+  pages(state) {
+    if (!state.set) {
+      return 0
+    }
+    let c = (state.set.total / defaultLimit) + 1
+    return parseInt(c)
+  }
 }
 
 function orderArray(arr, field, order) {
@@ -53,8 +66,8 @@ function orderArray(arr, field, order) {
 }
 
 const mutations = {
-  'sort.requests'(state, {field, order}) {
-    state.requests = orderArray(state.requests, field, order)
+  'sort.data'(state, {field, order}) {
+    state.set.data = orderArray(state.set.data, field, order)
   },
   'sort.vmu.gaps'(state, {field, order}) {
     state.vmugaps = orderArray(state.vmugaps, field, order)
@@ -65,8 +78,8 @@ const mutations = {
   'update.status'(state, status) {
     state.status = status
   },
-  'update.requests'(state, requests) {
-    state.requests = requests
+  'update.set'(state, set) {
+    state.set = Object.assign({}, set)
   },
   'update.vmu.gaps'(state, gaps) {
     state.vmugaps = gaps
@@ -100,49 +113,57 @@ function fetchBasic(url) {
   })
 }
 
+function buildURL(endpoint, q) {
+  let url = `${process.env.VUE_APP_API}/${endpoint}/`
+  if (q) {
+    url = `${url}?${$.param(q)}`
+  }
+  return url
+}
+
 const actions = {
   'fetch.status'({commit}) {
-    return fetchData(`${process.env.VUE_APP_API}/status/`, commit, "status")
+    return fetchData(buildURL("status"), commit, "status")
   },
   'fetch.config'({commit}) {
-    return fetchData(`${process.env.VUE_APP_API}/config/`, commit, "config")
+    return fetchData(buildURL("config"), commit, "config")
   },
   'fetch.requests'({commit}, q) {
-    let url = `${process.env.VUE_APP_API}/requests/?${$.param(q)}`
-    return fetchData(url, commit, "requests")
+    q = Object.assign(q, {limit: defaultLimit})
+    return fetchData(buildURL("requests", q), commit, "set")
   },
   'fetch.vmu.gaps'({commit}, q) {
-    let url = `${process.env.VUE_APP_API}/archives/vmu/gaps/?${$.param(q)}`
-    return fetchData(url, commit, "vmu.gaps")
+    q = Object.assign(q, {limit: defaultLimit})
+    return fetchData(buildURL("archives/vmu/gaps", q), commit, "vmu.gaps")
   },
   'fetch.hrd.gaps'({commit}, q) {
-    let url = `${process.env.VUE_APP_API}/archives/hrd/gaps/?${$.param(q)}`
-    return fetchData(url, commit, "hrd.gaps")
+    q = Object.assign(q, {limit: defaultLimit})
+    return fetchData(buildURL("archives/hrd/gaps", q), commit, "hrd.gaps")
   },
   'fetch.requests.status'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/requests/status/`)
+    return fetchBasic(buildURL("requests/status"))
   },
   'fetch.requests.stats'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/stats/requests/`).then(list => {
+    return fetchBasic(buildURL("stats/requests")).then(list => {
       return Promise.resolve(_.groupBy(list, 'status'))
     })
   },
   'fetch.items.stats'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/stats/items/`).then(list => {
+    return fetchBasic(buildURL("stats/items")).then(list => {
       return Promise.resolve(_.groupBy(list, 'label'))
     })
   },
   'fetch.vmu.records'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/records/`)
+    return fetchBasic(buildURL("archives/vmu/records"))
   },
   'fetch.vmu.sources'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/archives/vmu/sources/`)
+    return fetchBasic(buildURL("archives/vmu/sources"))
   },
   'fetch.hrd.channels'() {
-    return fetchBasic(`${process.env.VUE_APP_API}/archives/hrd/channels/`)
+    return fetchBasic(buildURL("archives/vmu/sources"))
   },
   'register.request'(_, data) {
-    return fetch(`${process.env.VUE_APP_API}/requests/`, {headers, method: 'POST', body: JSON.stringify(data)}).then(rs => {
+    return fetch(buildURL("requests"), {headers, method: 'POST', body: JSON.stringify(data)}).then(rs => {
       if (!rs.ok) {
         return Promise.reject(rs.statusText)
       }
@@ -150,7 +171,7 @@ const actions = {
     })
   },
   'cancel.request'(_, {id, comment}) {
-    return fetch(`${process.env.VUE_APP_API}/requests/${id}`, {headers, method: 'POST', body: JSON.stringify({comment})}).then(rs => {
+    return fetch(`${buildURL("requests")}${id}`, {headers, method: 'POST', body: JSON.stringify({comment})}).then(rs => {
       if (!rs.ok) {
         return Promise.reject(rs.statusText)
       }
@@ -158,7 +179,7 @@ const actions = {
     })
   },
   'update.variable'(_, {id, data}) {
-    return fetch(`${process.env.VUE_APP_API}/config/${id}`, {headers, method: 'PUT', body: JSON.stringify(data)}).then(rs => {
+    return fetch(`${buildURL("config")}${id}`, {headers, method: 'PUT', body: JSON.stringify(data)}).then(rs => {
       if (!rs.ok) {
         return Promise.reject(rs.statusText)
       }

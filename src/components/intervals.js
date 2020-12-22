@@ -1,4 +1,4 @@
-import {Duration} from 'luxon'
+import {Duration, DateTime} from 'luxon'
 
 const IsoFormat = "yyyy-LL-dd'T'HH:mm:ss"
 const RFC3339 = "yyyy-LL-dd'T'HH:mm:ss'Z'"
@@ -17,4 +17,8 @@ const Periods = [
   Duration.fromISO("P15D"),
 ]
 
-export {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods}
+function formatTime(str) {
+  return str
+}
+
+export {MaxDays, MaxMessage, IsoFormat, RFC3339, Periods, formatTime}
