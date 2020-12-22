@@ -44,7 +44,7 @@
           <td>0x{{g.source}}</td>
           <td>{{g.dtstart}}</td>
           <td>{{g.dtend}}</td>
-          <td class="text-center">{{g.last - g.first}}</td>
+          <td class="text-center" :title="missing(g)">{{g.last - g.first}}</td>
           <td class="text-right">
             <!-- <router-link :to="{name: 'view.vmu.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
@@ -65,20 +65,13 @@ import feather from 'feather-icons'
 import PageHeader from './PageHeader.vue'
 import SortBy from './SortBy.vue'
 import _ from 'lodash'
-// import {MaxDays, MaxMessage, Periods, IsoFormat} from './intervals.js'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
 import {vmufields} from './sort.js'
 
 export default {
   name: "VmuGap",
   beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.load()
-      vm.fetch()
-    })
-  },
-  beforeRouteLeave() {
-    this.save()
+    next(vm => vm.fetch())
   },
   data() {
     return {
@@ -104,20 +97,10 @@ export default {
     },
   },
   methods: {
-    load() {
-      this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
-      this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
-      this.source = localStorage["filter.source"] ? JSON.parse(localStorage["filter.source"]) : ""
-      this.channel = localStorage["filter.record"] ? JSON.parse(localStorage["filter.record"]) : ""
-    },
-    save() {
-      localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
-      localStorage.setItem("filter.dtend", JSON.stringify(this.dtend))
-      localStorage.setItem("filter.source", JSON.stringify(this.source))
-      localStorage.setItem("filter.record", JSON.stringify(this.record))
+    missing(g) {
+      return `${g.first} -> ${g.last}`
     },
     fetch() {
-      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {

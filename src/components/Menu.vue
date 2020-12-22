@@ -34,6 +34,12 @@
           <span class="px-2">Variables</span>
         </router-link>
       </li>
+      <li class="nav-item" v-if="logLink">
+        <a :href="logLink" target="_blank" class="nav-link">
+          <i data-feather="file-text"></i>
+          <span class="px-2">Logs</span>
+        </a>
+      </li>
     </ul>
   </div>
 </template>
@@ -52,6 +58,9 @@ export default {
     totalVMU() {
       return this.$store.getters.totalVMU
     },
+    logLink() {
+      return process.env.VUE_APP_LOG
+    }
   },
   mounted() {
     feather.replace()

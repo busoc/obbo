@@ -3,7 +3,7 @@
     <h6>status</h6>
     <dl class="row">
       <dt class="col-3">status</dt>
-      <dd class="col-9 text-right">{{autobrm.state}}</dd>
+      <dd class="col-9 text-right">{{autobrm.state ? "running" : "unknown"}}</dd>
       <dt class="col-3">number gaps</dt>
       <dd class="col-9 text-right"></dd>
       <dt class="col-3">gaps duration</dt>

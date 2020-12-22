@@ -13,7 +13,7 @@ import VmuGapDetail from './components/VmuGapDetail.vue'
 import HrdGapDetail from './components/HrdGapDetail.vue'
 import Dashboard from './components/Dashboard.vue'
 import store from './store.js'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
   {
@@ -64,7 +64,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 })
 

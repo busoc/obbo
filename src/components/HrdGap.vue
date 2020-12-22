@@ -37,7 +37,7 @@
           <td>{{g.channel}}</td>
           <td>{{g.dtstart}}</td>
           <td>{{g.dtend}}</td>
-          <td class="text-center">{{g.last - g.first}}</td>
+          <td class="text-center" :title="missing(g)">{{g.last - g.first}}</td>
           <td class="text-right">
             <!-- <router-link title="view detail" :to="{name: 'view.hrd.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
@@ -64,13 +64,7 @@ import {hrdfields} from './sort.js'
 export default {
   name: "HrdGap",
   beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.load()
-      vm.fetch()
-    })
-  },
-  beforeRouteLeave() {
-    this.save()
+    next(vm => vm.fetch())
   },
   updated() {
     feather.replace()
@@ -94,18 +88,10 @@ export default {
     }
   },
   methods: {
-    load() {
-      this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
-      this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
-      this.channel = localStorage["filter.channel"] ? JSON.parse(localStorage["filter.channel"]) : ""
-    },
-    save() {
-      localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
-      localStorage.setItem("filter.dtend", JSON.stringify(this.dtend))
-      localStorage.setItem("filter.channel", JSON.stringify(this.channel))
+    missing(g) {
+      return `${g.first} -> ${g.last}`
     },
     fetch() {
-      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {

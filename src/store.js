@@ -47,7 +47,7 @@ const getters = {
 
 function orderArray(arr, field, order) {
   if (!order) {
-    order = "asc"
+    order = "desc"
   }
   return field ? _.orderBy(arr, field, order) : arr
 }

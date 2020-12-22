@@ -68,13 +68,7 @@ import {repfields} from './sort.js'
 export default {
   name: "Requests",
   beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.load()
-      vm.fetch()
-    })
-  },
-  beforeRouteLeave() {
-    this.save()
+    next(vm => vm.fetch())
   },
   data() {
     return {
@@ -98,18 +92,7 @@ export default {
     },
   },
   methods: {
-    load() {
-      this.dtstart = localStorage["filter.dtstart"] ? JSON.parse(localStorage["filter.dtstart"]) : ""
-      this.dtend = localStorage["filter.dtend"] ? JSON.parse(localStorage["filter.dtend"]) : ""
-      this.status = localStorage["filter.status"] ? JSON.parse(localStorage["filter.status"]) : ""
-    },
-    save() {
-      localStorage.setItem("filter.dtstart", JSON.stringify(this.dtstart))
-      localStorage.setItem("filter.dtend", JSON.stringify(this.dtend))
-      localStorage.setItem("filter.status", JSON.stringify(this.status))
-    },
     fetch() {
-      this.save()
       let start = DateTime.fromISO(this.dtstart)
       let end = DateTime.fromISO(this.dtend)
       let q = {

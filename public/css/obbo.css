@@ -30,3 +30,7 @@ svg g.tick line {
   stroke-dasharray: 5;
   stroke-width: 0.15;
 }
+
+table.table > tbody > tr > td {
+  font-size: 0.9rem;
+}
