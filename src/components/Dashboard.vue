@@ -1,6 +1,5 @@
 <template>
   <div>
-    <PageHeader :title="'Dashboard'"/>
     <div class="px-3 my-4">
       <div class="row">
         <TinyStat :title="'pending'" :list="replays.PENDING"/>
@@ -70,7 +69,6 @@
 import _ from 'lodash'
 import {Duration} from 'luxon'
 import TinyStat from './TinyStat.vue'
-import PageHeader from './common/PageHeader.vue'
 import Lines from './charts/Lines.vue'
 
 function toArray(values) {
@@ -89,11 +87,6 @@ function formatDuration(d) {
 
 export default {
   name: 'Dashboard',
-  components: {
-    TinyStat,
-    PageHeader,
-    Lines,
-  },
   beforeRouteEnter(to, from, next) {
     next(vm => vm.fetch())
   },
@@ -125,6 +118,10 @@ export default {
         this.counts.hrd = toArray(_.groupBy(list.HRD, 'origin'))
       })
     },
+  },
+  components: {
+    TinyStat,
+    Lines,
   },
 }
 </script>

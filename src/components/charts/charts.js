@@ -1,5 +1,5 @@
 const margins = {
-  left: 30,
+  left: 35,
   right: 10,
   top: 10,
   bottom: 25,
