@@ -162,6 +162,12 @@ const actions = {
       return Promise.resolve(_.groupBy(list, 'label'))
     })
   },
+  'fetch.packets.stats'() {
+    return fetchBasic(buildURL("stats/packets")).then(list => {
+      console.log(_.groupBy(list, 'label'))
+      return Promise.resolve(_.groupBy(list, 'label'))
+    })
+  },
   'fetch.vmu.records'() {
     return fetchBasic(buildURL("archives/vmu/records"))
   },

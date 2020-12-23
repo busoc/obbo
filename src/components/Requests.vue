@@ -34,8 +34,8 @@
           <td class="text-center">{{r.status}}</td>
           <td>{{formatTime(r.dtstart)}}</td>
           <td>{{formatTime(r.dtend)}}</td>
-          <td class="text-center">?</td>
-          <td class="text-center">?</td>
+          <td class="text-center">{{r.missing}}</td>
+          <td class="text-center">{{r.corrupted}}</td>
           <td class="text-center">{{r.priority == -1 ? '-' : r.priority}}</td>
           <td class="text-center">
             <i v-if="r.automatic" data-feather="award"></i>

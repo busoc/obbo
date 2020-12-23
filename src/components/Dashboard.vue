@@ -11,6 +11,20 @@
     </div>
     <div class="px-3 my-4">
       <div class="row">
+        <div class="col my-1" v-for="vs in packets.missing" :key="vs.label">
+          <Lines :what="'missing-'+vs.label" :list="vs.list" :field="'count'"/>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 my-4">
+      <div class="row">
+        <div class="col my-1" v-for="vs in packets.corrupted" :key="vs.label">
+          <Lines :what="'corrupted-'+vs.label" :list="vs.list" :field="'count'"/>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 my-4">
+      <div class="row">
         <div class="col my-1" v-for="vs in counts.vmu" :key="vs.label">
           <Lines :what="'vmu-gaps-0x'+vs.label" :list="vs.list" :field="'count'"/>
         </div>
@@ -91,12 +105,20 @@ export default {
         vmu: [],
         hrd: [],
       },
+      packets: {
+        missing: [],
+        corrupted: [],
+      },
       durationFormatter: formatDuration,
     }
   },
   methods: {
     fetch() {
       this.$store.dispatch('fetch.requests.stats').then(list => this.replays = Object.assign({}, list))
+      this.$store.dispatch('fetch.packets.stats').then(list => {
+        this.packets.missing = toArray(_.groupBy(list.MISSING, 'channel'))
+        this.packets.corrupted = toArray(_.groupBy(list.CORRUPTED, 'channel'))
+      })
       this.$store.dispatch('fetch.items.stats').then(list => {
         this.counts.replay = [...list.REPLAY]
         this.counts.vmu = toArray(_.groupBy(list.VMU, 'origin'))
