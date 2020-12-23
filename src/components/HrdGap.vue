@@ -10,6 +10,12 @@
           <option value=""></option>
           <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
+        <div class="form-check mx-1">
+          <input type="checkbox" v-model="criteria.corrupted" id="corrupted" class="form-check-input"/>
+          <label for="corrupted" class="form-check-label">
+            <span>include corrupted packet(s)</span>
+          </label>
+        </div>
       </form>
       <SortBy :fields="fields" @update:sort="sortData"/>
     </div>
@@ -22,6 +28,7 @@
           <th class="text-capitalize">Starts</th>
           <th class="text-capitalize">Ends</th>
           <th class="text-capitalize text-center">Missing</th>
+          <th class="text-capitalize text-center">Corrupted</th>
           <th></th>
         </tr>
       </thead>
@@ -31,7 +38,14 @@
           <td>{{g.channel}}</td>
           <td>{{formatTime(g.dtstart)}}</td>
           <td>{{formatTime(g.dtend)}}</td>
-          <td class="text-center" :title="missing(g)">{{g.last - g.first}}</td>
+          <td class="text-center">
+            <span v-if="g.last > g.first" :title="missing(g)">{{g.last - g.first}}</span>
+          </td>
+          <td class="text-center">
+            <span v-if="g.last == g.first">
+              <i data-feather="check"></i>
+            </span>
+          </td>
           <td class="text-right">
             <!-- <router-link title="view detail" :to="{name: 'view.hrd.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
@@ -64,6 +78,7 @@ const defaultCriteria = {
   dtstart: "",
   dtend: "",
   channel: "",
+  corrupted: false,
 }
 
 export default {
@@ -93,7 +108,7 @@ export default {
   },
   watch: {
     $route() {
-      this.criteria = _.pick(this.$route.query, ["channel", "dtstart", "dtend"])
+      this.criteria = _.pick(this.$route.query, ["channel", "corrupted", "dtstart", "dtend"])
       this.fetch()
     },
   },
@@ -115,6 +130,7 @@ export default {
         channel: this.criteria.channel,
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
+        corrupted: this.criteria.corrupted,
         page: this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
