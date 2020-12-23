@@ -13,7 +13,8 @@
       </form>
       <SortBy :fields="fields" @update:sort="sortData"/>
     </div>
-    <table class="table table-hover my-3">
+    <Loading />
+    <table class="table table-hover my-3" v-if="requests && requests.length">
       <thead class="thead-dark">
         <tr>
           <th class="text-capitalize">Time</th>
@@ -27,10 +28,10 @@
       </thead>
       <tbody>
         <tr v-for="r in requests" :key="r.id">
-          <td>{{r.time}}</td>
+          <td>{{formatTime(r.time)}}</td>
           <td class="text-center">{{r.status}}</td>
-          <td>{{r.dtstart}}</td>
-          <td>{{r.dtend}}</td>
+          <td>{{formatTime(r.dtstart)}}</td>
+          <td>{{formatTime(r.dtend)}}</td>
           <td class="text-center">{{r.priority == -1 ? '-' : r.priority}}</td>
           <td class="text-center">
             <i v-if="r.automatic" data-feather="award"></i>
@@ -46,6 +47,7 @@
         </tr>
       </tbody>
     </table>
+    <Empty v-else/>
     <Paginate :query="query"/>
   </div>
 </template>
@@ -57,7 +59,10 @@ import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
 import Paginate from './common/Paginate.vue'
 import RangeForm from './common/Range.vue'
+import Loading from './common/Loading.vue'
+import Empty from './common/Empty.vue'
 import {repfields} from './sort.js'
+import {formatTime} from './intervals.js'
 
 const defaultCriteria = {
   dtstart: "",
@@ -97,6 +102,9 @@ export default {
     },
   },
   methods: {
+    formatTime(str) {
+      return formatTime(str)
+    },
     updateRange({start, end}) {
       this.criteria.dtstart = start
       this.criteria.dtend = end
@@ -121,6 +129,8 @@ export default {
     Paginate,
     SortBy,
     RangeForm,
+    Loading,
+    Empty,
   },
 }
 </script>

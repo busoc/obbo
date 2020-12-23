@@ -6,12 +6,22 @@
       <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
     </select>
     <label>Range</label>
-    <input @change="changed" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
-    <input @change="changed" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
+    <input @change="changed"
+      v-model="dtstart"
+      type="text"
+      pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+      :class="['form-control', 'form-control-sm', 'mx-1', {'is-invalid': errors.dtstart}]"
+      id="dtstart"/>
+    <input @change="changed"
+      v-model="dtend"
+      type="text"
+      pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+      :class="['form-control', 'form-control-sm', 'mx-1', {'is-invalid': errors.dtend}]"
+      id="dtend"/>
   </form>
 </template>
 <script>
-import {IsoFormat, RFC3339, Periods} from '../intervals.js'
+import {IsoFormat, RFC3339, DoyFormat, Periods} from '../intervals.js'
 import {DateTime, Duration} from 'luxon'
 
 export default {
@@ -20,25 +30,39 @@ export default {
   emits: ['update:range'],
   data() {
     return {
-      duration: "",
+      duration: Periods[Periods.length-1],
       dtstart: this.start,
       dtend: this.end,
+      errors: {
+        dtstart: false,
+        dtend: false,
+      },
       periods: Periods,
     }
   },
   methods: {
     changed() {
-      let start = DateTime.fromISO(this.dtstart)
-      let end = DateTime.fromISO(this.dtend)
+      let start = DateTime.fromFormat(this.dtstart, DoyFormat)
+      let end = DateTime.fromFormat(this.dtend, DoyFormat)
       let q = {}
 
       if (start.isValid) {
         q.start = start.toFormat(RFC3339)
+        this.errors.dtstart = false
+      } else {
+        this.errors.dtstart = true
+        return
       }
       if (end.isValid) {
         q.end = end.toFormat(RFC3339)
+        this.errors.dtend = false
+      } else {
+        this.errors.dtend = true
+        return
       }
       if (start.isValid && end.isValid && end < start) {
+        this.errors.dtend = true
+        this.errors.dtend = true
         return
       }
       this.$emit('update:range', q)
@@ -50,8 +74,8 @@ export default {
       let end = DateTime.local()
       let start = end.minus(Duration.fromISO(this.duration))
 
-      this.dtstart = start.toFormat(IsoFormat)
-      this.dtend = end.toFormat(IsoFormat)
+      this.dtstart = start.toFormat(DoyFormat)
+      this.dtend = end.toFormat(DoyFormat)
 
       this.changed()
     },

@@ -13,7 +13,8 @@
       </form>
       <SortBy :fields="fields" @update:sort="sortData"/>
     </div>
-    <table class="table table-hover my-3">
+    <Loading />
+    <table class="table table-hover my-3" v-if="gaps && gaps.length">
       <thead class="thead-dark">
         <tr>
           <th class="text-capitalize">Time</th>
@@ -26,10 +27,10 @@
       </thead>
       <tbody>
         <tr v-for="g in gaps" :key="g.id">
-          <td>{{g.time}}</td>
+          <td>{{formatTime(g.time)}}</td>
           <td>{{g.channel}}</td>
-          <td>{{g.dtstart}}</td>
-          <td>{{g.dtend}}</td>
+          <td>{{formatTime(g.dtstart)}}</td>
+          <td>{{formatTime(g.dtend)}}</td>
           <td class="text-center" :title="missing(g)">{{g.last - g.first}}</td>
           <td class="text-right">
             <!-- <router-link title="view detail" :to="{name: 'view.hrd.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
@@ -42,6 +43,7 @@
         </tr>
       </tbody>
     </table>
+    <Empty v-else/>
     <Paginate :query="query"/>
   </div>
 </template>
@@ -54,6 +56,9 @@ import _ from 'lodash'
 import {hrdfields} from './sort.js'
 import Paginate from './common/Paginate.vue'
 import RangeForm from './common/Range.vue'
+import Loading from './common/Loading.vue'
+import Empty from './common/Empty.vue'
+import {formatTime} from './intervals.js'
 
 const defaultCriteria = {
   dtstart: "",
@@ -93,6 +98,9 @@ export default {
     },
   },
   methods: {
+    formatTime(str) {
+      return formatTime(str)
+    },
     missing(g) {
       return `${g.first} -> ${g.last}`
     },
@@ -121,6 +129,8 @@ export default {
     SortBy,
     Paginate,
     RangeForm,
+    Loading,
+    Empty,
   },
 }
 </script>

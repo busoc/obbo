@@ -12,13 +12,18 @@ const autobrm = {
   vmsize: "N/A",
 }
 
+const defaultSet = {
+  total: 0,
+  data: [],
+}
+
 const state = {
   status: {
     autobrm
   },
-  vmugaps: [],
   config:  [],
-  set: {},
+  set: defaultSet,
+  loading: false,
 }
 
 const getters = {
@@ -53,6 +58,9 @@ const getters = {
     }
     let c = (state.set.total / defaultLimit) + 1
     return parseInt(c)
+  },
+  isLoading(state) {
+    return state.loading
   }
 }
 
@@ -67,28 +75,20 @@ const mutations = {
   'sort.data'(state, {field, order}) {
     state.set.data = orderArray(state.set.data, field, order)
   },
-  'sort.vmu.gaps'(state, {field, order}) {
-    state.vmugaps = orderArray(state.vmugaps, field, order)
-  },
   'update.status'(state, status) {
     state.status = status
   },
-  'update.set'(state, set) {
-    if (_.isEmpty(set)) {
-      // state.set.total = 0
-      state.set.objects = []
-      return
-    }
-    state.set = Object.assign({}, set)
-  },
-  'update.vmu.gaps'(state, gaps) {
-    state.vmugaps = gaps
-  },
-  'update.hrd.gaps'(state, gaps) {
-    state.hrdgaps = gaps
-  },
   'update.config'(state, config) {
     state.config = config
+  },
+  'set.reset'(state) {
+    state.set = Object.assign({}, defaultSet)
+  },
+  'set.update'(state, set) {
+    state.set = Object.assign({}, set)
+  },
+  'loading.switch'(state) {
+    state.loading = !state.loading
   }
 }
 
@@ -103,7 +103,10 @@ function fetchData(url, commit, what) {
     }
     return rs.json()
   }).then(rs => {
-    commit(`update.${what}`, rs)
+    commit(what, rs)
+    if (what == "set.update") {
+      commit("loading.switch")
+    }
   })
 }
 
@@ -123,25 +126,28 @@ function buildURL(endpoint, q) {
 
 const actions = {
   'fetch.status'({commit}) {
-    return fetchData(buildURL("status"), commit, "status")
+    return fetchData(buildURL("status"), commit, "update.status")
   },
   'fetch.config'({commit}) {
-    return fetchData(buildURL("config"), commit, "config")
+    return fetchData(buildURL("config"), commit, "update.config")
   },
   'fetch.requests'({commit}, q) {
-    commit('update.set', {})
+    commit('set.reset')
+    commit('loading.switch')
     q = Object.assign(q, {limit: defaultLimit})
-    return fetchData(buildURL("requests", q), commit, "set")
+    return fetchData(buildURL("requests", q), commit, 'set.update')
   },
   'fetch.vmu.gaps'({commit}, q) {
-    commit('update.set', {})
+    commit('set.reset')
+    commit('loading.switch')
     q = Object.assign(q, {limit: defaultLimit})
-    return fetchData(buildURL("archives/vmu/gaps", q), commit, "vmu.gaps")
+    return fetchData(buildURL("archives/vmu/gaps", q), commit, 'set.update')
   },
   'fetch.hrd.gaps'({commit}, q) {
-    commit('update.set', {})
+    commit('set.reset')
+    commit('loading.switch')
     q = Object.assign(q, {limit: defaultLimit})
-    return fetchData(buildURL("archives/hrd/gaps", q), commit, "set")
+    return fetchData(buildURL("archives/hrd/gaps", q), commit, 'set.update')
   },
   'fetch.requests.status'() {
     return fetchBasic(buildURL("requests/status"))
