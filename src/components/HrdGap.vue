@@ -3,17 +3,10 @@
     <router-view></router-view>
     <PageHeader :title="'HRD Gaps'"/>
     <div class="d-flex justify-content-between my-3 px-3">
+      <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
       <form class="form-inline filter-form">
-        <label for="period">Period</label>
-        <select v-model="duration" @change="updateRange" id="period" class="form-control form-control-sm mx-1">
-          <option></option>
-          <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
-        </select>
-        <label>Range</label>
-        <input @change="fetch" v-model="dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
-        <input @change="fetch" v-model="dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="channel">Channel</label>
-        <select @change="fetch" v-model="channel" id="channel" class="form-control form-control-sm mx-1">
+        <select @change="fetch" v-model="criteria.channel" id="channel" class="form-control form-control-sm mx-1">
           <option value=""></option>
           <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
@@ -49,17 +42,24 @@
         </tr>
       </tbody>
     </table>
+    <Paginate :query="query"/>
   </div>
 </template>
 
 <script>
-import {DateTime, Duration} from 'luxon'
 import feather from 'feather-icons'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
 import _ from 'lodash'
-import {IsoFormat, RFC3339, Periods} from './intervals.js'
 import {hrdfields} from './sort.js'
+import Paginate from './common/Paginate.vue'
+import RangeForm from './common/Range.vue'
+
+const defaultCriteria = {
+  dtstart: "",
+  dtend: "",
+  channel: "",
+}
 
 export default {
   name: "HrdGap",
@@ -71,69 +71,56 @@ export default {
   },
   data() {
     return {
-      dtstart: "",
-      dtend: "",
-      channel: "",
+      criteria: defaultCriteria,
       channellist: [],
-      periods: Periods,
-      duration: "",
     }
   },
   computed: {
     gaps() {
-      return this.$store.state.hrdgaps
+      return this.$store.getters.objects
     },
     fields() {
       return hrdfields
-    }
+    },
+    query() {
+      return Object.assign({}, this.criteria)
+    },
+  },
+  watch: {
+    $route() {
+      this.criteria = _.pick(this.$route.query, ["channel", "dtstart", "dtend"])
+      this.fetch()
+    },
   },
   methods: {
     missing(g) {
       return `${g.first} -> ${g.last}`
     },
+    updateRange({start, end}) {
+      this.criteria.dtstart = start
+      this.criteria.dtend = end
+
+      this.fetch()
+    },
     fetch() {
-      let start = DateTime.fromISO(this.dtstart)
-      let end = DateTime.fromISO(this.dtend)
       let q = {
-        channel: this.channel,
-        dtstart: "",
-        dtend: "",
-      }
-      if (start.isValid) {
-        q.dtstart = start.toFormat(RFC3339)
-      }
-      if (end.isValid) {
-        q.dtend = end.toFormat(RFC3339)
-      }
-      if (start.isValid && end.isValid) {
-        if (end < start) {
-          return
-        }
+        channel: this.criteria.channel,
+        dtstart: this.criteria.dtstart,
+        dtend: this.criteria.dtend,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
     },
     sortData(field, order) {
-      this.$store.commit('sort.hrd.gaps', {field, order})
-    },
-    updateRange() {
-      if (!this.duration) {
-        return
-      }
-      let end = DateTime.local()
-      let start = end.minus(Duration.fromISO(this.duration))
-
-      this.dtstart = start.toFormat(IsoFormat)
-      this.dtend = end.toFormat(IsoFormat)
-      this.fetch()
-    },
-    formatDuration(d) {
-      return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
+      this.$store.commit('sort.data', {field, order})
     },
   },
   components: {
     PageHeader,
     SortBy,
+    Paginate,
+    RangeForm,
   },
 }
 </script>

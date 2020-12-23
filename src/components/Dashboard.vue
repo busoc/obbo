@@ -56,7 +56,7 @@
 import _ from 'lodash'
 import {Duration} from 'luxon'
 import TinyStat from './TinyStat.vue'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 import Lines from './charts/Lines.vue'
 
 function toArray(values) {

@@ -3,15 +3,8 @@
     <router-view></router-view>
     <PageHeader :title="'Replay'"/>
     <div class="d-flex justify-content-between my-3 px-3">
+      <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
       <form class="form-inline filter-form">
-        <label for="period">Period</label>
-        <select v-model="duration" @change="updateRange" id="period" class="form-control form-control-sm mx-1">
-          <option></option>
-          <option v-for="(p, i) in periods" :key="i" :value="p.toISO()">{{formatDuration(p)}}</option>
-        </select>
-        <label>Range</label>
-        <input @change="fetch" v-model="criteria.dtstart" type="datetime-local" class="form-control form-control-sm mx-1" id="dtstart"/>
-        <input @change="fetch" v-model="criteria.dtend" type="datetime-local" class="form-control form-control-sm mx-1" id="dtend"/>
         <label for="status">Status</label>
         <select @change="fetch" v-model="criteria.status" id="status" class="form-control form-control-sm mx-1">
           <option></option>
@@ -58,13 +51,12 @@
 </template>
 
 <script>
-import {DateTime, Duration} from 'luxon'
 import _ from 'lodash'
 import feather from 'feather-icons'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
 import Paginate from './common/Paginate.vue'
-import {IsoFormat, RFC3339, Periods} from './intervals.js'
+import RangeForm from './common/Range.vue'
 import {repfields} from './sort.js'
 
 const defaultCriteria = {
@@ -81,9 +73,7 @@ export default {
   data() {
     return {
       criteria: defaultCriteria,
-      duration: "",
       statuslist: [],
-      periods: Periods,
     }
   },
   updated() {
@@ -97,11 +87,7 @@ export default {
       return repfields
     },
     query() {
-      return {
-        status: this.criteria.status,
-        dtstart: this.criteria.dtstart,
-        dtend: this.criteria.dtend,
-      }
+      return Object.assign({}, this.criteria)
     },
   },
   watch: {
@@ -111,25 +97,17 @@ export default {
     },
   },
   methods: {
+    updateRange({start, end}) {
+      this.criteria.dtstart = start
+      this.criteria.dtend = end
+      this.fetch()
+    },
     fetch() {
-      let start = DateTime.fromISO(this.criteria.dtstart)
-      let end = DateTime.fromISO(this.criteria.dtend)
       let q = {
         status: this.criteria.status,
-        dtstart: "",
-        dtend: "",
+        dtstart: this.criteria.dtstart,
+        dtend: this.criteria.dtend,
         page: this.$route.query.page ? this.$route.query.page : 1,
-      }
-      if (start.isValid) {
-        q.dtstart = start.toFormat(RFC3339)
-      }
-      if (end.isValid) {
-        q.dtend = end.toFormat(RFC3339)
-      }
-      if (start.isValid && end.isValid) {
-        if (end < start) {
-          return
-        }
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
@@ -137,26 +115,12 @@ export default {
     sortData(field, order) {
       this.$store.commit('sort.data', {field, order})
     },
-    updateRange() {
-      if (!this.duration) {
-        return
-      }
-      let end = DateTime.local()
-      let start = end.minus(Duration.fromISO(this.duration))
-
-      this.criteria.dtstart = start.toFormat(IsoFormat)
-      this.criteria.dtend = end.toFormat(IsoFormat)
-
-      this.fetch()
-    },
-    formatDuration(d) {
-      return d.days ? `${d.days} DAYS` : `${d.hours} HOUR(S)`
-    },
   },
   components: {
     PageHeader,
     Paginate,
     SortBy,
+    RangeForm,
   },
 }
 </script>

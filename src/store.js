@@ -16,9 +16,7 @@ const state = {
   status: {
     autobrm
   },
-  requests: [],
   vmugaps: [],
-  hrdgaps: [],
   config:  [],
   set: {},
 }
@@ -71,9 +69,6 @@ const mutations = {
   },
   'sort.vmu.gaps'(state, {field, order}) {
     state.vmugaps = orderArray(state.vmugaps, field, order)
-  },
-  'sort.hrd.gaps'(state, {field, order}) {
-    state.hrdgaps = orderArray(state.hrdgaps, field, order)
   },
   'update.status'(state, status) {
     state.status = status
@@ -138,7 +133,7 @@ const actions = {
   },
   'fetch.hrd.gaps'({commit}, q) {
     q = Object.assign(q, {limit: defaultLimit})
-    return fetchData(buildURL("archives/hrd/gaps", q), commit, "hrd.gaps")
+    return fetchData(buildURL("archives/hrd/gaps", q), commit, "set")
   },
   'fetch.requests.status'() {
     return fetchBasic(buildURL("requests/status"))
@@ -160,7 +155,7 @@ const actions = {
     return fetchBasic(buildURL("archives/vmu/sources"))
   },
   'fetch.hrd.channels'() {
-    return fetchBasic(buildURL("archives/vmu/sources"))
+    return fetchBasic(buildURL("archives/hrd/channels"))
   },
   'register.request'(_, data) {
     return fetch(buildURL("requests"), {headers, method: 'POST', body: JSON.stringify(data)}).then(rs => {

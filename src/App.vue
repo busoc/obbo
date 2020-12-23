@@ -17,8 +17,8 @@
 
 <script>
 import Status from './components/Status.vue'
-import Menu from './components/Menu.vue'
-import Nav from './components/Nav.vue'
+import Menu from './components/common/Menu.vue'
+import Nav from './components/common/Nav.vue'
 
 export default {
   name: 'App',

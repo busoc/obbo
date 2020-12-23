@@ -29,7 +29,7 @@
 
 <script>
 import feather from 'feather-icons'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 
 export default {
   name: "Config",

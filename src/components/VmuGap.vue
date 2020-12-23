@@ -62,7 +62,7 @@
 <script>
 import {DateTime, Duration} from 'luxon'
 import feather from 'feather-icons'
-import PageHeader from './PageHeader.vue'
+import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
 import _ from 'lodash'
 import {IsoFormat, RFC3339, Periods} from './intervals.js'
