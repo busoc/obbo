@@ -10,11 +10,11 @@
           <p v-if="err" class="alert alert-danger border-0">{{err}}</p>
           <div class="form-group">
             <label class="text-capitalize" for="dtstart">start date</label>
-            <input type="datetime-local" v-model="dtstart" :class="['form-control', {'is-invalid': errors.dtstart}]" id="dtstart"/>
+            <input @change="validate" type="text" pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}" v-model="dtstart" :class="['form-control', {'is-invalid': errors.dtstart}]" id="dtstart"/>
           </div>
           <div class="form-group">
             <label class="text-capitalize" for="dtend">end date</label>
-            <input type="datetime-local" v-model="dtend" :class="['form-control', {'is-invalid': errors.dtend}]" id="dtend"/>
+            <input @change="validate" type="text" pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}" v-model="dtend" :class="['form-control', {'is-invalid': errors.dtend}]" id="dtend"/>
           </div>
           <div class="form-group">
             <label class="text-capitalize" for="priority">priority</label>
@@ -37,6 +37,7 @@
 
 <script>
 import {DateTime} from 'luxon'
+import {DoyFormat, RFC3339} from './intervals.js'
 import $ from 'jquery'
 import 'bootstrap'
 
@@ -60,9 +61,23 @@ export default {
     toggle() {
       $(this.$el).modal('toggle')
     },
+    validate() {
+      let start = DateTime.fromFormat(this.dtstart, DoyFormat)
+      let end = DateTime.fromFormat(this.dtend, DoyFormat)
+
+      this.errors.dtstart = false
+      this.errors.dtend = false
+
+      if (!start.isValid) {
+        this.errors.dtstart = true
+      }
+      if (!end.isValid) {
+        this.errors.dtend = true
+      }
+    },
     register() {
-      let start = DateTime.fromISO(this.dtstart)
-      let end = DateTime.fromISO(this.dtend)
+      let start = DateTime.fromFormat(this.dtstart, DoyFormat)
+      let end = DateTime.fromFormat(this.dtend, DoyFormat)
       let q = {
         comment: this.comment,
         priority: parseInt(this.priority),
@@ -77,12 +92,12 @@ export default {
         this.errors.dtstart = true
         return
       }
-      q.dtstart = start.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      q.dtstart = start.toFormat(RFC3339)
       if (!end.isValid) {
         this.errors.dtend = true
         return
       }
-      q.dtend = end.toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'")
+      q.dtend = end.toFormat(RFC3339)
 
       if (end < start) {
         this.errors.dtstart = true
@@ -101,8 +116,8 @@ export default {
     next(v => {
         v.prev = from.name
         if (to.query.dtstart && to.query.dtend) {
-          v.dtstart = DateTime.fromISO(to.query.dtstart).toFormat("yyyy-LL-dd'T'HH:mm:ss")
-          v.dtend = DateTime.fromISO(to.query.dtend).toFormat("yyyy-LL-dd'T'HH:mm:ss")
+          v.dtstart = DateTime.fromISO(to.query.dtstart).toFormat(DoyFormat)
+          v.dtend = DateTime.fromISO(to.query.dtend).toFormat(DoyFormat)
         }
         v.toggle()
     });

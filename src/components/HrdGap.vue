@@ -11,7 +11,7 @@
           <option v-for="c in channellist" :value="c.channel" :key="c.channel">{{c.channel}}</option>
         </select>
         <div class="form-check mx-1">
-          <input type="checkbox" v-model="criteria.corrupted" id="corrupted" class="form-check-input"/>
+          <input @change="fetch" type="checkbox" v-model="criteria.corrupted" id="corrupted" class="form-check-input"/>
           <label for="corrupted" class="form-check-label">
             <span>include corrupted packet(s)</span>
           </label>
@@ -28,7 +28,7 @@
           <th class="text-capitalize">Starts</th>
           <th class="text-capitalize">Ends</th>
           <th class="text-capitalize text-center">Missing</th>
-          <th class="text-capitalize text-center">Corrupted</th>
+          <th v-if="criteria.corrupted" class="text-capitalize text-center">Corrupted</th>
           <th></th>
         </tr>
       </thead>
@@ -41,7 +41,7 @@
           <td class="text-center">
             <span v-if="g.last > g.first" :title="missing(g)">{{g.last - g.first}}</span>
           </td>
-          <td class="text-center">
+          <td class="text-center" v-if="criteria.corrupted">
             <span v-if="g.last == g.first">
               <i data-feather="check"></i>
             </span>
