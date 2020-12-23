@@ -74,6 +74,11 @@ const mutations = {
     state.status = status
   },
   'update.set'(state, set) {
+    if (_.isEmpty(set)) {
+      // state.set.total = 0
+      state.set.objects = []
+      return
+    }
     state.set = Object.assign({}, set)
   },
   'update.vmu.gaps'(state, gaps) {
@@ -124,14 +129,17 @@ const actions = {
     return fetchData(buildURL("config"), commit, "config")
   },
   'fetch.requests'({commit}, q) {
+    commit('update.set', {})
     q = Object.assign(q, {limit: defaultLimit})
     return fetchData(buildURL("requests", q), commit, "set")
   },
   'fetch.vmu.gaps'({commit}, q) {
+    commit('update.set', {})
     q = Object.assign(q, {limit: defaultLimit})
     return fetchData(buildURL("archives/vmu/gaps", q), commit, "vmu.gaps")
   },
   'fetch.hrd.gaps'({commit}, q) {
+    commit('update.set', {})
     q = Object.assign(q, {limit: defaultLimit})
     return fetchData(buildURL("archives/hrd/gaps", q), commit, "set")
   },
