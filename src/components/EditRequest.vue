@@ -10,7 +10,7 @@
         <p v-if="err" class="alert alert-danger border-0">{{err}}</p>
           <div class="form-group">
             <label for="priority" class="text-capitalize">priority</label>
-            <input v-model="priority" type="number" class="form-control" id="priority" placeholder="1106"/>
+            <input v-model.number="priority" type="number" class="form-control" id="priority" placeholder="1106"/>
           </div>
         </form>
       </div>
@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       err: "",
-      priority: 0,
+      priority: "",
       origin: {},
       working: false,
     }

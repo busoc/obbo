@@ -12,7 +12,7 @@
             <span>previous</span>
           </router-link>
         </li>
-        <li v-for="i in pages" :class="['page-item', {active: current==i}]">
+        <li v-for="i in pages" :class="['page-item', {active: current==i}]" :key="i">
           <router-link class="page-link" :to="{name: $route.name, query: build(i)}">
             <span>{{i}}</span>
           </router-link>

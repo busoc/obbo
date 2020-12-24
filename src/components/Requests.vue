@@ -41,10 +41,10 @@
             <i v-if="r.automatic" data-feather="award"></i>
           </td>
           <td class="text-right">
-            <router-link v-if="r.cancellable" title="edit request priority" :to="{name: 'view.request.priority', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
+            <router-link v-if="r.cancellable" title="edit request priority" :to="{name: 'replay.request.priority', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
             </router-link>
-            <router-link v-if="r.cancellable" title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
+            <router-link v-if="r.cancellable" title="cancel request" :to="{name: 'replay.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
               <i data-feather="trash-2"></i>
             </router-link>
           </td>
@@ -60,7 +60,7 @@
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
-import SortBy from './common/SortBy.vue'
+// import SortBy from './common/SortBy.vue'
 import Paginate from './common/Paginate.vue'
 import RangeForm from './common/Range.vue'
 import Loading from './common/Loading.vue'
@@ -109,7 +109,7 @@ export default {
         return
       }
       this.criteria = _.pick(this.$route.query, Object.keys(this.criteria))
-      this.fetch()
+      this.resetAndFetch()
     },
   },
   methods: {
@@ -145,7 +145,7 @@ export default {
   components: {
     PageHeader,
     Paginate,
-    SortBy,
+    // SortBy,
     RangeForm,
     Loading,
     Empty,
