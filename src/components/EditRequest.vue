@@ -3,21 +3,20 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Cancel Request</h5>
+        <h5 class="modal-title">Edit Request's Priority</h5>
       </div>
       <div class="modal-body">
-        <form @submit.prevent="cancel">
+        <form @submit.prevent="apply">
         <p v-if="err" class="alert alert-danger border-0">{{err}}</p>
-        <p>Confirm canceling the current request? No more actions will be performed by autobrm after the request has been marked as canceled</p>
           <div class="form-group">
-            <label for="comment" class="text-capitalize">comment</label>
-            <input v-model="comment" type="text" class="form-control" id="comment" placeholder="additional information about the reason"/>
+            <label for="priority" class="text-capitalize">priority</label>
+            <input v-model="priority" type="number" class="form-control" id="priority" placeholder="1106"/>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <router-link :to="origin" class="btn btn-secondary">close</router-link>
-        <button @click="cancel" type="button" class="btn btn-primary">
+        <button @click="apply" type="button" class="btn btn-primary">
           <span v-if="working" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
           <span v-else>apply</span>
         </button>
@@ -32,30 +31,32 @@ import $ from 'jquery'
 import 'bootstrap'
 
 export default {
-  name: 'CancelRequest',
+  name: 'EditRequest',
   data() {
     return {
       err: "",
-      comment: "",
+      priority: 0,
       origin: {},
       working: false,
     }
   },
   methods: {
-    cancel() {
+    apply() {
       if (this.working) {
         return
       }
+      let q = {
+        priority: parseInt(this.priority),
+        id: this.$route.params.id,
+      }
       this.working = true
-      this.$store.dispatch("cancel.request", {id: this.$route.params.id, comment: this.comment})
-        .catch(err => {
-          this.err = err
-          this.working = false
-        })
-        .then(() => {
-          this.working = false
-          this.$router.push(this.origin)
-        })
+      this.$store.dispatch('update.request', q).then(() => {
+        this.$router.push(this.origin)
+        this.working = false
+      }).catch(err => {
+        this.err = err
+        this.working = false
+      })
     },
     toggle() {
       $(this.$el).modal('toggle')
@@ -63,8 +64,8 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(v => {
-      v.toggle()
-      v.origin = Object.assign(from, {query: to.query})
+        v.toggle()
+        v.origin = Object.assign(from, {query: to.query})
     });
   },
   beforeRouteLeave(to, from, next) {

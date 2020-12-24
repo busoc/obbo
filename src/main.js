@@ -4,6 +4,7 @@ import Autobrm from './components/Autobrm.vue'
 import Requests from './components/Requests.vue'
 import NewRequest from './components/NewRequest.vue'
 import CancelRequest from './components/CancelRequest.vue'
+import EditRequest from './components/EditRequest.vue'
 import EditVariable from './components/EditVariable.vue'
 import VmuGap from './components/VmuGap.vue'
 import HrdGap from './components/HrdGap.vue'
@@ -25,10 +26,12 @@ const routes = [
         path: '/requests/',
         name: 'view.requests',
         component: Requests,
+        children: [
+          {path: 'new', name:'new.request', component: NewRequest},
+          {path: ':id/cancel', name: 'view.request.cancel', component: CancelRequest},
+          {path: ':id/edit', name: 'view.request.priority', component: EditRequest},
+        ],
       },
-      {path: '/new', name:'new.request', component: NewRequest},
-      {path: '/requests/', name: 'view.requests', component: Requests},
-      {path: '/requests/:id/cancel', name: 'view.request.cancel', component: CancelRequest},
       {
         path: '/archives/vmu',
         name: 'view.vmu.gaps',

@@ -98,15 +98,15 @@ const headers = {
 
 function fetchData(url, commit, what) {
   return fetch(url, {headers}).then(rs => {
+    if (what == "set.update") {
+      commit("loading.switch")
+    }
     if (!rs.ok) {
       return Promise.reject(rs.statusText)
     }
     return rs.json()
   }).then(rs => {
     commit(what, rs)
-    if (what == "set.update") {
-      commit("loading.switch")
-    }
   })
 }
 
@@ -186,6 +186,14 @@ const actions = {
   },
   'cancel.request'(_, {id, comment}) {
     return fetch(`${buildURL("requests")}${id}`, {headers, method: 'POST', body: JSON.stringify({comment})}).then(rs => {
+      if (!rs.ok) {
+        return Promise.reject(rs.statusText)
+      }
+      return Promise.resolve("")
+    })
+  },
+  'update.request'(_, {priority, id}) {
+    return fetch(`${buildURL("requests")}${id}`, {headers, method: 'PUT', body: JSON.stringify({priority})}).then(rs => {
       if (!rs.ok) {
         return Promise.reject(rs.statusText)
       }

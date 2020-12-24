@@ -11,7 +11,7 @@
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
       </form>
-      <SortBy :fields="fields" @update:sort="sortData"/>
+      <!-- <SortBy :fields="fields" @update:sort="sortData"/> -->
     </div>
     <Loading />
     <table class="table table-hover my-3" v-if="requests && requests.length">
@@ -41,9 +41,9 @@
             <i v-if="r.automatic" data-feather="award"></i>
           </td>
           <td class="text-right">
-            <!-- <router-link title="view request detail" :to="{name: 'view.request.detail', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
+            <router-link v-if="r.cancellable" title="edit request priority" :to="{name: 'view.request.priority', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
-            </router-link> -->
+            </router-link>
             <router-link v-if="r.cancellable" title="cancel request" :to="{name: 'view.request.cancel', params: {id: r.id}}" class="btn btn-danger btn-sm mx-1">
               <i data-feather="trash-2"></i>
             </router-link>
@@ -101,7 +101,11 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name != from.name) {
+      // if (to.name != from.name) {
+      //   return
+      // }
+      let ix = from.matched.findIndex(r => r.name == to.name)
+      if (ix < 0) {
         return
       }
       this.criteria = _.pick(this.$route.query, Object.keys(this.criteria))
@@ -129,7 +133,7 @@ export default {
         status: this.criteria.status,
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
-        page: 1, //this.$route.query.page ? this.$route.query.page : 1,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })

@@ -15,8 +15,20 @@
           <option value=""></option>
           <option v-for="s in sourcelist" :key="s.source" :value="s.source">0x{{s.source}}</option>
         </select>
+        <div class="form-check mx-1">
+          <input @change="fetch" type="checkbox" v-model="criteria.corrupted" id="corrupted" class="form-check-input"/>
+          <label for="corrupted" class="form-check-label">
+            <span>include corrupted packet(s)</span>
+          </label>
+        </div>
+        <div class="form-check mx-1">
+          <input @change="fetch" type="checkbox" v-model="criteria.completed" id="completed" class="form-check-input"/>
+          <label for="completed" class="form-check-label">
+            <span>include completed gap(s)</span>
+          </label>
+        </div>
       </form>
-      <SortBy @update:sort="sortData"/>
+      <!-- <SortBy @update:sort="sortData"/> -->
     </div>
     <Loading/>
     <table class="table table-hover my-3" v-if="gaps && gaps.length">
@@ -28,6 +40,7 @@
           <th class="text-capitalize">Starts</th>
           <th class="text-capitalize">Ends</th>
           <th class="text-capitalize text-center">Missing</th>
+          <th class="text-capitalize text-center">Completed</th>
           <th></th>
         </tr>
       </thead>
@@ -39,12 +52,18 @@
           <td>{{formatTime(g.dtstart)}}</td>
           <td>{{formatTime(g.dtend)}}</td>
           <td class="text-center" :title="missing(g)">{{g.last - g.first}}</td>
+          <td class="text-center">
+            <i v-if="g.completed" data-feather="check"></i>
+          </td>
           <td class="text-right">
-            <!-- <router-link :to="{name: 'view.vmu.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
-              <i data-feather="edit"></i>
-            </router-link> -->
             <router-link title="create request" :to="{name: 'vmu.new.request', params: {id: g.id}, query: {dtstart: g.dtstart, dtend: g.dtend}}" class="btn btn-secondary btn-sm mx-1">
               <i data-feather="plus-square"></i>
+            </router-link>
+            <router-link  v-if="!g.completed" title="edit request priority" :to="{name: 'view.request.priority', params: {id: g.replay}, query: criteria}" class="btn btn-primary btn-sm mx-1">
+              <i data-feather="edit"></i>
+            </router-link>
+            <router-link v-if="!g.completed" title="cancel request" :to="{name: 'view.request.cancel', params: {id: g.replay}, query: criteria}" class="btn btn-danger btn-sm mx-1">
+              <i data-feather="trash-2"></i>
             </router-link>
           </td>
         </tr>
@@ -72,6 +91,8 @@ const defaultCriteria = {
   dtend: "",
   source: "",
   record: "",
+  corrupted: false,
+  completed: false,
 }
 
 export default {
@@ -102,7 +123,11 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name != from.name) {
+      // if (to.name != from.name) {
+      //   return
+      // }
+      let ix = from.matched.findIndex(r => r.name == to.name)
+      if (ix < 0) {
         return
       }
       this.criteria = _.pick(this.$route.query, Object.keys(this.criteria))
@@ -135,7 +160,9 @@ export default {
         record: this.criteria.record,
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
-        page: 1, //this.$route.query.page,
+        corrupted: this.criteria.corrupted,
+        completed: this.criteria.completed,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       }
 
       this.$store.dispatch('fetch.vmu.gaps', q)

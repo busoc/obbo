@@ -16,8 +16,14 @@
             <span>include corrupted packet(s)</span>
           </label>
         </div>
+        <div class="form-check mx-1">
+          <input @change="fetch" type="checkbox" v-model="criteria.completed" id="completed" class="form-check-input"/>
+          <label for="completed" class="form-check-label">
+            <span>include completed gap(s)</span>
+          </label>
+        </div>
       </form>
-      <SortBy :fields="fields" @update:sort="sortData"/>
+      <!-- <SortBy :fields="fields" @update:sort="sortData"/> -->
     </div>
     <Loading />
     <table class="table table-hover my-3" v-if="gaps && gaps.length">
@@ -28,18 +34,22 @@
           <th class="text-capitalize">Starts</th>
           <th class="text-capitalize">Ends</th>
           <th class="text-capitalize text-center">Missing</th>
+          <th class="text-capitalize text-center">Completed</th>
           <th v-if="criteria.corrupted" class="text-capitalize text-center">Corrupted</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="g in gaps" :key="g.id">
-          <td>{{formatTime(g.time)}}</td>
+          <td>{{formatTime(g.time)}} - {{g.id}}</td>
           <td>{{g.channel}}</td>
           <td>{{formatTime(g.dtstart)}}</td>
           <td>{{formatTime(g.dtend)}}</td>
           <td class="text-center">
             <span v-if="g.last > g.first" :title="missing(g)">{{g.last - g.first}}</span>
+          </td>
+          <td class="text-center">
+            <i v-if="g.completed" data-feather="check"></i>
           </td>
           <td class="text-center" v-if="criteria.corrupted">
             <span v-if="g.last == g.first">
@@ -47,11 +57,14 @@
             </span>
           </td>
           <td class="text-right">
-            <!-- <router-link title="view detail" :to="{name: 'view.hrd.detail', params: {id: g.id}}" class="btn btn-primary btn-sm mx-1">
-              <i data-feather="edit"></i>
-            </router-link> -->
             <router-link title="create request" :to="{name: 'hrd.new.request', params: {id: g.id}, query: {dtstart: g.dtstart, dtend: g.dtend}}" class="btn btn-secondary btn-sm mx-1">
               <i data-feather="plus-square"></i>
+            </router-link>
+            <router-link v-if="!g.completed" title="edit request priority" :to="{name: 'view.request.priority', params: {id: g.replay}, query: criteria}" class="btn btn-primary btn-sm mx-1">
+              <i data-feather="edit"></i>
+            </router-link>
+            <router-link v-if="!g.completed" title="cancel request" :to="{name: 'view.request.cancel', params: {id: g.replay}, query: criteria}" class="btn btn-danger btn-sm mx-1">
+              <i data-feather="trash-2"></i>
             </router-link>
           </td>
         </tr>
@@ -79,6 +92,7 @@ const defaultCriteria = {
   dtend: "",
   channel: "",
   corrupted: false,
+  completed: false,
 }
 
 export default {
@@ -108,7 +122,11 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name != from.name) {
+      // if (to.name != from.name) {
+      //   return
+      // }
+      let ix = from.matched.findIndex(r => r.name == to.name)
+      if (ix < 0) {
         return
       }
       this.criteria = _.pick(this.$route.query, Object.keys(this.criteria))
@@ -141,7 +159,8 @@ export default {
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
         corrupted: this.criteria.corrupted,
-        page: 1, //this.$route.query.page ? this.$route.query.page : 1,
+        completed: this.criteria.completed,
+        page: this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
