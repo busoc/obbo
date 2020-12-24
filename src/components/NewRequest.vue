@@ -10,11 +10,23 @@
           <p v-if="err" class="alert alert-danger border-0">{{err}}</p>
           <div class="form-group">
             <label class="text-capitalize" for="dtstart">start date</label>
-            <input @change="validate" type="text" pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}" v-model="dtstart" :class="['form-control', {'is-invalid': errors.dtstart}]" id="dtstart"/>
+            <input @change="validate"
+              type="text"
+              pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+              placeholder="yyyy.ddd.hh.mm.ss"
+              v-model="dtstart"
+              :class="['form-control', {'is-invalid': errors.dtstart}]"
+              id="dtstart"/>
           </div>
           <div class="form-group">
             <label class="text-capitalize" for="dtend">end date</label>
-            <input @change="validate" type="text" pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}" v-model="dtend" :class="['form-control', {'is-invalid': errors.dtend}]" id="dtend"/>
+            <input @change="validate"
+              type="text"
+              pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+              placeholder="yyyy.ddd.hh.mm.ss"
+              v-model="dtend"
+              :class="['form-control', {'is-invalid': errors.dtend}]"
+              id="dtend"/>
           </div>
           <div class="form-group">
             <label class="text-capitalize" for="priority">priority</label>

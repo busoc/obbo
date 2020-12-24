@@ -84,7 +84,7 @@ const defaultCriteria = {
 export default {
   name: "HrdGap",
   beforeRouteEnter (to, from, next) {
-    next(vm => vm.fetch())
+    next(vm => vm.resetAndFetch())
   },
   updated() {
     feather.replace()
@@ -107,12 +107,22 @@ export default {
     },
   },
   watch: {
-    $route() {
-      this.criteria = _.pick(this.$route.query, ["channel", "corrupted", "dtstart", "dtend"])
+    $route(to, from) {
+      if (to.name != from.name) {
+        return
+      }
+      this.criteria = _.pick(this.$route.query, Object.keys(this.criteria))
       this.fetch()
     },
   },
   methods: {
+    resetAndFetch() {
+      this.reset()
+      this.fetch()
+    },
+    reset() {
+      this.$store.commit('set.reset')
+    },
     formatTime(str) {
       return formatTime(str)
     },
@@ -131,7 +141,7 @@ export default {
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
         corrupted: this.criteria.corrupted,
-        page: this.$route.query.page ? this.$route.query.page : 1,
+        page: 1, //this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })

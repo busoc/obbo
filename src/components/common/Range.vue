@@ -10,18 +10,20 @@
       v-model="dtstart"
       type="text"
       pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+      placeholder="yyyy.ddd.hh.mm.ss"
       :class="['form-control', 'form-control-sm', 'mx-1', {'is-invalid': errors.dtstart}]"
       id="dtstart"/>
     <input @change="changed"
       v-model="dtend"
       type="text"
       pattern="[0-9]{4}.[0-9]{3}.[0-9]{2}.[0-9]{2}.[0-9]{2}"
+      placeholder="yyyy.ddd.hh.mm.ss"
       :class="['form-control', 'form-control-sm', 'mx-1', {'is-invalid': errors.dtend}]"
       id="dtend"/>
   </form>
 </template>
 <script>
-import {IsoFormat, RFC3339, DoyFormat, Periods} from '../intervals.js'
+import {RFC3339, DoyFormat, Periods} from '../intervals.js'
 import {DateTime, Duration} from 'luxon'
 
 export default {

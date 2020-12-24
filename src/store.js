@@ -2,7 +2,7 @@ import $ from 'jquery'
 import _ from 'lodash'
 import {createStore} from 'vuex'
 
-const defaultLimit = 50
+const defaultLimit = 100
 
 const autobrm = {
   cmdline: "N/A",
@@ -164,7 +164,6 @@ const actions = {
   },
   'fetch.packets.stats'() {
     return fetchBasic(buildURL("stats/packets")).then(list => {
-      console.log(_.groupBy(list, 'label'))
       return Promise.resolve(_.groupBy(list, 'label'))
     })
   },
