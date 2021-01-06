@@ -1,17 +1,15 @@
 <template>
   <div class="col-md-12 col-lg-12 d-md-block bg-light px-3 py-2 border-top border-right bg-light">
-    <h6>status</h6>
+    <h6>Status</h6>
     <dl class="row">
-      <dt class="col-3">status</dt>
-      <dd class="col-9 text-right">{{autobrm.state ? "running" : "unknown"}}</dd>
-      <dt class="col-3">number gaps</dt>
-      <dd class="col-9 text-right"></dd>
-      <dt class="col-3">gaps duration</dt>
-      <dd class="col-9 text-right"></dd>
-      <dt class="col-3">incoming requests</dt>
-      <dd class="col-9 text-right"></dd>
-      <dt class="col-3">consolidate size</dt>
-      <dd class="col-9 text-right"></dd>
+      <dt class="col-5">autobrm</dt>
+      <dd class="col-7 text-right">{{autobrm.state ? "running" : "unknown"}}</dd>
+      <dt class="col-5">requests</dt>
+      <dd class="col-7 text-right">{{$store.getters.totalRequest || 0}}</dd>
+      <dt class="col-5">vmu gaps</dt>
+      <dd class="col-7 text-right">{{$store.getters.totalVMU || 0}}</dd>
+      <dt class="col-5">hrd gaps</dt>
+      <dd class="col-7 text-right">{{$store.getters.totalHRD || 0}}</dd>
     </dl>
   </div>
 </template>
@@ -32,7 +30,7 @@ div {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 270px;
+  height: 180px;
 }
 div dt {
   font-size: 13px;
