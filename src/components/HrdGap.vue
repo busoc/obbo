@@ -23,7 +23,7 @@
           </label>
         </div>
       </form>
-      <!-- <SortBy :fields="fields" @update:sort="sortData"/> -->
+      <SortBy :fields="sortFields" @update:sort="updateSort"/>
     </div>
     <Loading />
     <table class="table table-hover my-3" v-if="gaps && gaps.length">
@@ -78,7 +78,7 @@
 <script>
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
-// import SortBy from './common/SortBy.vue'
+import SortBy from './common/SortBy.vue'
 import _ from 'lodash'
 import {hrdfields} from './sort.js'
 import Paginate from './common/Paginate.vue'
@@ -93,6 +93,8 @@ const defaultCriteria = {
   channel: "",
   corrupted: false,
   completed: false,
+  field: "",
+  order: "",
 }
 
 export default {
@@ -113,7 +115,7 @@ export default {
     gaps() {
       return this.$store.getters.objects
     },
-    fields() {
+    sortFields() {
       return hrdfields
     },
     query() {
@@ -153,6 +155,11 @@ export default {
 
       this.fetch()
     },
+    updateSort({field, order}) {
+      this.criteria.field = field
+      this.criteria.order = order
+      this.fetch()
+    },
     fetch() {
       let q = {
         channel: this.criteria.channel,
@@ -160,18 +167,17 @@ export default {
         dtend: this.criteria.dtend,
         corrupted: this.criteria.corrupted,
         completed: this.criteria.completed,
+        order: this.criteria.order,
+        by: this.criteria.field,
         page: this.$route.query.page ? this.$route.query.page : 1,
       }
       this.$store.dispatch('fetch.hrd.gaps', q)
       this.$store.dispatch('fetch.hrd.channels').then(list => {this.channellist = _.sortBy(list, 'channel') })
     },
-    sortData(field, order) {
-      this.$store.commit('sort.data', {field, order})
-    },
   },
   components: {
     PageHeader,
-    // SortBy,
+    SortBy,
     Paginate,
     RangeForm,
     Loading,

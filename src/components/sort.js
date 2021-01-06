@@ -1,17 +1,20 @@
 const vmufields = {
-  start: 'dtstart',
-  end: 'dtend',
+  time: 'timestamp',
+  start: 'last_timestamp',
+  end: 'next_timestamp',
   record: 'record',
   source: 'source',
 }
 const hrdfields = {
-  start: 'dtstart',
-  end: 'dtend',
+  time: 'timestamp',
+  start: 'last_timestamp',
+  end: 'next_timestamp',
   channel: 'channel'
 }
 const repfields = {
-  start: 'dtstart',
-  end: 'dtend',
+  time: 'timestamp',
+  start: 'startdate',
+  end: 'enddate',
   status: 'status',
   priority: 'priority',
   automatic: 'automatic',

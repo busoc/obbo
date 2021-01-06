@@ -28,7 +28,7 @@
           </label>
         </div>
       </form>
-      <!-- <SortBy @update:sort="sortData"/> -->
+      <SortBy :fields="sortFields" @update:sort="updateSort"/>
     </div>
     <Loading/>
     <table class="table table-hover my-3" v-if="gaps && gaps.length">
@@ -83,7 +83,7 @@
 <script>
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
-// import SortBy from './common/SortBy.vue'
+import SortBy from './common/SortBy.vue'
 import RangeForm from './common/Range.vue'
 import Paginate from './common/Paginate.vue'
 import Loading from './common/Loading.vue'
@@ -99,6 +99,8 @@ const defaultCriteria = {
   record: "",
   corrupted: false,
   completed: false,
+  field: "",
+  order: "",
 }
 
 export default {
@@ -120,7 +122,7 @@ export default {
     gaps() {
       return this.$store.getters.objects
     },
-    fields() {
+    sortFields() {
       return vmufields
     },
     query() {
@@ -160,6 +162,11 @@ export default {
 
       this.fetch()
     },
+    updateSort({field, order}){
+      this.criteria.field = field
+      this.criteria.order = order
+      this.fetch()
+    },
     fetch() {
       let q = {
         source: this.criteria.source,
@@ -168,6 +175,8 @@ export default {
         dtend: this.criteria.dtend,
         corrupted: this.criteria.corrupted,
         completed: this.criteria.completed,
+        order: this.criteria.order,
+        by: this.criteria.field,
         page: this.$route.query.page ? this.$route.query.page : 1,
       }
 
@@ -175,13 +184,10 @@ export default {
       this.$store.dispatch('fetch.vmu.records').then(list => {this.recordlist = _.sortBy(list, 'record') })
       this.$store.dispatch('fetch.vmu.sources').then(list => {this.sourcelist = _.sortBy(list, 'source') })
     },
-    sortData(field, order) {
-      this.$store.commit('sort.data', {field, order})
-    },
   },
   components: {
     PageHeader,
-    // SortBy,
+    SortBy,
     RangeForm,
     Paginate,
     Loading,

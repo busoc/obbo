@@ -11,7 +11,7 @@
           <option v-for="s in statuslist" :key="s.name">{{s.name}}</option>
         </select>
       </form>
-      <!-- <SortBy :fields="fields" @update:sort="sortData"/> -->
+      <SortBy :fields="sortFields" @update:sort="updateSort"/>
     </div>
     <Loading />
     <table class="table table-hover my-3" v-if="requests && requests.length">
@@ -60,7 +60,7 @@
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
-// import SortBy from './common/SortBy.vue'
+import SortBy from './common/SortBy.vue'
 import Paginate from './common/Paginate.vue'
 import RangeForm from './common/Range.vue'
 import Loading from './common/Loading.vue'
@@ -72,6 +72,8 @@ const defaultCriteria = {
   dtstart: "",
   dtend: "",
   status: "",
+  field: "",
+  order: "",
 }
 
 export default {
@@ -92,7 +94,7 @@ export default {
     requests() {
       return this.$store.getters.objects
     },
-    fields() {
+    sortFields() {
       return repfields
     },
     query() {
@@ -128,24 +130,28 @@ export default {
       this.criteria.dtend = end
       this.fetch()
     },
+    updateSort({field, order}) {
+      this.criteria.field = field
+      this.criteria.order = order
+      this.fetch()
+    },
     fetch() {
       let q = {
         status: this.criteria.status,
         dtstart: this.criteria.dtstart,
         dtend: this.criteria.dtend,
         page: this.$route.query.page ? this.$route.query.page : 1,
+        by: this.criteria.field,
+        order: this.criteria.order,
       }
       this.$store.dispatch('fetch.requests', q)
       this.$store.dispatch('fetch.requests.status').then(list => {this.statuslist = _.sortBy(list, 'name') })
-    },
-    sortData(field, order) {
-      this.$store.commit('sort.data', {field, order})
     },
   },
   components: {
     PageHeader,
     Paginate,
-    // SortBy,
+    SortBy,
     RangeForm,
     Loading,
     Empty,

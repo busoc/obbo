@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     changed() {
-      this.$emit('update:sort', this.field, this.order)
+      this.$emit('update:sort', {field: this.field, order: this.order})
     },
   },
 }
