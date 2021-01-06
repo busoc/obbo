@@ -64,17 +64,7 @@ const getters = {
   }
 }
 
-function orderArray(arr, field, order) {
-  if (!order) {
-    order = "desc"
-  }
-  return field ? _.orderBy(arr, field, order) : arr
-}
-
 const mutations = {
-  'sort.data'(state, {field, order}) {
-    state.set.data = orderArray(state.set.data, field, order)
-  },
   'update.status'(state, status) {
     state.status = status
   },
