@@ -1,7 +1,9 @@
 <template>
   <div>
     <router-view></router-view>
-    <PageHeader :title="'Replay'"/>
+    <PageHeader :title="'Replay'">
+      <GroupSelect @update:multiple="updateMulti"/>
+    </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">
       <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
       <form class="form-inline filter-form">
@@ -17,6 +19,7 @@
     <table class="table table-hover my-3" v-if="requests && requests.length">
       <thead class="thead-dark">
         <tr>
+          <th v-if="multiple"></th>
           <th class="text-capitalize">Time</th>
           <th class="text-center text-capitalize">Status</th>
           <th class="text-capitalize">Starts</th>
@@ -25,11 +28,14 @@
           <th class="text-center text-capitalize">Corrupted</th>
           <th class="text-center text-capitalize">Priority</th>
           <th class="text-center text-capitalize">Automatic</th>
-          <th></th>
+          <th v-if="!multiple"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="r in requests" :key="r.id">
+          <td v-if="multiple">
+            <input type="checkbox" v-if="r.cancellable"/>
+          </td>
           <td>{{formatTime(r.time)}}</td>
           <td class="text-center">{{r.status}}</td>
           <td>{{formatTime(r.dtstart)}}</td>
@@ -40,7 +46,7 @@
           <td class="text-center">
             <i v-if="r.automatic" data-feather="award"></i>
           </td>
-          <td class="text-right">
+          <td v-if="!multiple" class="text-right">
             <router-link v-if="r.cancellable" title="edit request priority" :to="{name: 'replay.request.priority', params: {id: r.id}}" class="btn btn-primary btn-sm mx-1">
               <i data-feather="edit"></i>
             </router-link>
@@ -57,10 +63,13 @@
 </template>
 
 <script>
+import $ from 'jquery'
+import 'bootstrap'
 import _ from 'lodash'
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
+import GroupSelect from './common/GroupSelect.vue'
 import Paginate from './common/Paginate.vue'
 import RangeForm from './common/Range.vue'
 import Loading from './common/Loading.vue'
@@ -84,8 +93,12 @@ export default {
   data() {
     return {
       criteria: defaultCriteria,
+      multiple: false,
       statuslist: [],
     }
+  },
+  mounted() {
+    $().button('toggle')
   },
   updated() {
     feather.replace()
@@ -125,15 +138,18 @@ export default {
     formatTime(str) {
       return formatTime(str)
     },
+    updateMulti(multi) {
+      this.multiple = multi
+    },
     updateRange({start, end}) {
       this.criteria.dtstart = start
       this.criteria.dtend = end
-      this.fetch()
+      this.$router.push({name: this.$route.name, query: this.criteria})
     },
     updateSort({field, order}) {
       this.criteria.field = field
       this.criteria.order = order
-      this.fetch()
+      this.$router.push({name: this.$route.name, query: this.criteria})
     },
     fetch() {
       let q = {
@@ -155,6 +171,7 @@ export default {
     RangeForm,
     Loading,
     Empty,
+    GroupSelect,
   },
 }
 </script>

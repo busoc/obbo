@@ -69,7 +69,10 @@ export default {
       }
       this.$emit('update:range', q)
     },
-    updateRange() {
+    updateRange(e) {
+      if (e.target.id == "period") {
+        e.target.blur()
+      }
       if (!this.duration) {
         return
       }

@@ -1,7 +1,9 @@
 <template>
   <div>
     <router-view></router-view>
-    <PageHeader :title="'VMU Gaps'"/>
+    <PageHeader :title="'VMU Gaps'">
+      <GroupSelect @update:multiple="updateMultiple"/>
+    </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">
       <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
       <form class="form-inline filter-form">
@@ -34,6 +36,7 @@
     <table class="table table-hover my-3" v-if="gaps && gaps.length">
       <thead class="thead-dark">
         <tr>
+          <th v-if="multiple"></th>
           <th class="text-capitalize">Time</th>
           <th class="text-capitalize">Record</th>
           <th class="text-capitalize">Source</th>
@@ -42,11 +45,14 @@
           <th class="text-capitalize text-center">Missing</th>
           <th v-if="criteria.corrupted" class="text-capitalize text-center">Corrupted</th>
           <th v-if="criteria.completed" class="text-capitalize text-center">Completed</th>
-          <th></th>
+          <th v-if="!multiple"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="g in gaps" :key="g.id">
+          <td v-if="multiple">
+            <input type="checkbox" v-if="!g.completed"/>
+          </td>
           <td>{{formatTime(g.time)}}</td>
           <td>{{g.record}}</td>
           <td>0x{{g.source}}</td>
@@ -61,7 +67,7 @@
           <td v-if="criteria.completed" class="text-center">
             <i v-if="g.completed" data-feather="check"></i>
           </td>
-          <td class="text-right">
+          <td v-if="!multiple" class="text-right">
             <router-link title="create request" :to="{name: 'vmu.new.request', params: {id: g.id}, query: {dtstart: g.dtstart, dtend: g.dtend}}" class="btn btn-secondary btn-sm mx-1">
               <i data-feather="plus-square"></i>
             </router-link>
@@ -84,6 +90,7 @@
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
+import GroupSelect from './common/GroupSelect.vue'
 import RangeForm from './common/Range.vue'
 import Paginate from './common/Paginate.vue'
 import Loading from './common/Loading.vue'
@@ -111,6 +118,7 @@ export default {
   data() {
     return {
       criteria: defaultCriteria,
+      multiple: false,
       recordlist: [],
       sourcelist: [],
     }
@@ -159,13 +167,15 @@ export default {
     updateRange({start, end}) {
       this.criteria.dtstart = start
       this.criteria.dtend = end
-
-      this.fetch()
+      this.$router.push({name: this.$route.name, query: this.criteria})
     },
     updateSort({field, order}){
       this.criteria.field = field
       this.criteria.order = order
-      this.fetch()
+      this.$router.push({name: this.$route.name, query: this.criteria})
+    },
+    updateMultiple(multi) {
+      this.multiple = multi
     },
     fetch() {
       let q = {
@@ -192,6 +202,7 @@ export default {
     Paginate,
     Loading,
     Empty,
+    GroupSelect,
   },
 }
 </script>

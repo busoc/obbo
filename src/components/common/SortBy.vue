@@ -25,7 +25,8 @@ export default {
     }
   },
   methods: {
-    changed() {
+    changed(e) {
+      e.target.blur()
       this.$emit('update:sort', {field: this.field, order: this.order})
     },
   },
