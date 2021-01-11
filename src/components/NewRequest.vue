@@ -39,7 +39,7 @@
         </form>
       </div>
       <div class="modal-footer">
-        <router-link :to="{name: prev}" class="btn btn-secondary">close</router-link>
+        <router-link :to="origin" class="btn btn-secondary">close</router-link>
         <button :disabled="errors.dtstart || errors.dtend" @click="register" type="button" class="btn btn-primary">save</button>
       </div>
     </div>
@@ -57,7 +57,7 @@ export default {
   name: 'NewRequest',
   data() {
     return {
-      prev: undefined,
+      origin: {},
       dtstart: "",
       dtend: "",
       priority: "",
@@ -120,17 +120,17 @@ export default {
       this.$store.dispatch("register.request", q)
         .catch(rs => this.err = rs)
         .then(() => {
-          this.$router.push({name: this.prev})
+          this.$router.push(this.origin)
         })
     }
   },
   beforeRouteEnter(to, from, next) {
     next(v => {
-        v.prev = from.name
         if (to.query.dtstart && to.query.dtend) {
           v.dtstart = DateTime.fromISO(to.query.dtstart).toFormat(DoyFormat)
           v.dtend = DateTime.fromISO(to.query.dtend).toFormat(DoyFormat)
         }
+        v.origin = Object.assign(from, {query: from.query})
         v.toggle()
     });
   },

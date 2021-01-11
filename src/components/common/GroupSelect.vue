@@ -1,17 +1,21 @@
 <template>
   <div class="mx-3">
-    <a v-if="multiple"
-      href="#"
+    <router-link v-if="multiple"
+      :to="{name: editRoute, query: period}"
       title="edit new request from selected requests"
-      class="btn btn-primary btn-sm mx-1">
-      <i data-feather="edit"></i>
-    </a>
-    <a v-if="multiple"
-      href="#"
+      @click="updateMultiple"
+      class="btn btn-primary btn-sm mx-1"
+      :class="{disabled: disableEdit}">
+      <i data-feather="plus-square"></i>
+    </router-link>
+    <router-link v-if="multiple"
+      :to="{name: cancelRoute, query: {replay: this.replays}}"
       title="cancel selected requests"
-      class="btn btn-danger btn-sm mx-1">
+      @click="updateMultiple"
+      class="btn btn-danger btn-sm mx-1"
+      :class="{disabled: disableCancel}">
       <i data-feather="trash-2"></i>
-    </a>
+    </router-link>
     <button type="button"
       class="btn btn-sm btn-light"
       data-toggle="button"
@@ -23,13 +27,28 @@
   </div>
 </template>
 <script>
+
 export default {
   name: 'GroupSelect',
   emit: ['update:multiple'],
+  props: [
+    'period',
+    'replays',
+    'cancelRoute',
+    'editRoute'
+  ],
   data() {
     return {
       multiple: false,
     }
+  },
+  computed: {
+    disableEdit() {
+      return !this.period || Object.keys(this.period) == 0 || !this.period.dtstart || !this.period.dtend
+    },
+    disableCancel() {
+      return !this.replays || this.replays.length == 0
+    },
   },
   methods: {
     updateMultiple() {

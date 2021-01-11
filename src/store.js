@@ -182,6 +182,12 @@ const actions = {
       return Promise.resolve("")
     })
   },
+  'cancel.request.all'({dispatch}, {replays, comment}) {
+    let ps = replays.map(i => {
+      return dispatch('cancel.request', {id: i, comment: comment})
+    })
+    return Promise.all(ps)
+  },
   'update.request'(_, {priority, id}) {
     return fetch(`${buildURL("requests")}${id}`, {headers, method: 'PUT', body: JSON.stringify({priority})}).then(rs => {
       if (!rs.ok) {

@@ -65,7 +65,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(v => {
         v.toggle()
-        v.origin = Object.assign(from, {query: to.query})
+        v.origin = Object.assign(from, {query: from.query})
     });
   },
   beforeRouteLeave(to, from, next) {

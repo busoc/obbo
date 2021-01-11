@@ -2,7 +2,12 @@
   <div>
     <router-view></router-view>
     <PageHeader :title="'VMU Gaps'">
-      <GroupSelect @update:multiple="updateMultiple"/>
+      <GroupSelect v-if="gaps && gaps.length > 0"
+        :period="isoPeriod"
+        :replays="replays"
+        :cancelRoute="'vmu.request.cancel.all'"
+        :editRoute="'vmu.new.request'"
+        @update:multiple="updateMultiple"/>
     </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">
       <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
@@ -51,7 +56,7 @@
       <tbody>
         <tr v-for="g in gaps" :key="g.id">
           <td v-if="multiple">
-            <input type="checkbox" v-if="!g.completed"/>
+            <input @click="selectReplay(g)" type="checkbox" v-if="!g.completed"/>
           </td>
           <td>{{formatTime(g.time)}}</td>
           <td>{{g.record}}</td>
@@ -87,6 +92,8 @@
 </template>
 
 <script>
+import {DateTime} from 'luxon'
+import {RFC3339} from './intervals.js'
 import feather from 'feather-icons'
 import PageHeader from './common/PageHeader.vue'
 import SortBy from './common/SortBy.vue'
@@ -118,6 +125,11 @@ export default {
   data() {
     return {
       criteria: defaultCriteria,
+      period: {
+        dtstart: undefined,
+        dtend: undefined,
+      },
+      replays: [],
       multiple: false,
       recordlist: [],
       sourcelist: [],
@@ -136,6 +148,16 @@ export default {
     query() {
       return Object.assign({}, this.criteria)
     },
+    isoPeriod() {
+      let dtstart, dtend;
+      if (this.period.dtstart && this.period.dtstart.isValid) {
+        dtstart = this.period.dtstart.toFormat(RFC3339)
+      }
+      if (this.period.dtend && this.period.dtend.isValid) {
+        dtend = this.period.dtend.toFormat(RFC3339)
+      }
+      return {dtstart, dtend}
+    },
   },
   watch: {
     $route(to, from) {
@@ -151,6 +173,21 @@ export default {
     },
   },
   methods: {
+    selectReplay(r) {
+      let x = this.replays.indexOf(r.replay)
+      if (x < 0) {
+        this.replays.push(r.replay)
+      } else {
+        this.replays.splice(x, 1)
+      }
+      let when = DateTime.fromISO(r.time)
+      if (!this.period.dtstart || when < this.period.dtstart) {
+        this.period.dtstart = when
+      }
+      if (!this.period.dtend || when > this.period.dtend) {
+        this.period.dtend = when
+      }
+    },
     resetAndFetch() {
       this.reset()
       this.fetch()

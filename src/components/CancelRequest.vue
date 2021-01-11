@@ -3,7 +3,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Cancel Request</h5>
+        <h5 class="modal-title">Cancel Request(s) <span>({{total}})</span></h5>
       </div>
       <div class="modal-body">
         <form @submit.prevent="cancel">
@@ -41,13 +41,28 @@ export default {
       working: false,
     }
   },
+  computed: {
+    total() {
+      if (this.$route.params.id) {
+        return 1
+      }
+      return this.$route.query.replay.length
+    }
+  },
   methods: {
     cancel() {
       if (this.working) {
         return
       }
+      let replays = []
+      if (this.$route.params.id) {
+        replays.push(this.$route.params.id)
+      }
+      if (this.$route.query.replay) {
+        this.$route.query.replay.forEach(i => replays.push(i))
+      }
       this.working = true
-      this.$store.dispatch("cancel.request", {id: this.$route.params.id, comment: this.comment})
+      this.$store.dispatch("cancel.request.all", {replays, comment: this.comment})
         .catch(err => {
           this.err = err
           this.working = false
@@ -64,7 +79,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(v => {
       v.toggle()
-      v.origin = Object.assign(from, {query: to.query})
+      v.origin = Object.assign(from, {query: from.query})
     });
   },
   beforeRouteLeave(to, from, next) {

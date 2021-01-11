@@ -2,7 +2,12 @@
   <div>
     <router-view></router-view>
     <PageHeader :title="'Replay'">
-      <GroupSelect @update:multiple="updateMulti"/>
+      <GroupSelect v-if="requests && requests.length > 0"
+          :period="isoPeriod"
+          :replays="replays"
+          :cancelRoute="'replay.request.cancel.all'"
+          :editRoute="'replay.new.request'"
+          @update:multiple="updateMulti"/>
     </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">
       <RangeForm @update:range="updateRange" :start="criteria.dtstart" :end="criteria.dtend"/>
@@ -34,7 +39,7 @@
       <tbody>
         <tr v-for="r in requests" :key="r.id">
           <td v-if="multiple">
-            <input type="checkbox" v-if="r.cancellable"/>
+            <input @click="selectRequest(r)" type="checkbox" v-if="r.cancellable"/>
           </td>
           <td>{{formatTime(r.time)}}</td>
           <td class="text-center">{{r.status}}</td>
@@ -63,6 +68,8 @@
 </template>
 
 <script>
+import {DateTime} from 'luxon'
+import {RFC3339} from './intervals.js'
 import $ from 'jquery'
 import 'bootstrap'
 import _ from 'lodash'
@@ -93,6 +100,11 @@ export default {
   data() {
     return {
       criteria: defaultCriteria,
+      replays: [],
+      period: {
+        dtstart: undefined,
+        dtend: undefined,
+      },
       multiple: false,
       statuslist: [],
     }
@@ -113,6 +125,16 @@ export default {
     query() {
       return Object.assign({}, this.criteria)
     },
+    isoPeriod() {
+      let dtstart, dtend;
+      if (this.period.dtstart && this.period.dtstart.isValid) {
+        dtstart = this.period.dtstart.toFormat(RFC3339)
+      }
+      if (this.period.dtend && this.period.dtend.isValid) {
+        dtend = this.period.dtend.toFormat(RFC3339)
+      }
+      return {dtstart, dtend}
+    }
   },
   watch: {
     $route(to, from) {
@@ -128,6 +150,21 @@ export default {
     },
   },
   methods: {
+    selectRequest(r) {
+      let x = this.replays.indexOf(r.id)
+      if (x < 0) {
+        this.replays.push(r.id)
+      } else {
+        this.replays.splice(x, 1)
+      }
+      let when = DateTime.fromISO(r.time)
+      if (!this.period.dtstart || when < this.period.dtstart) {
+        this.period.dtstart = when
+      }
+      if (!this.period.dtend || when > this.period.dtend) {
+        this.period.dtend = when
+      }
+    },
     resetAndFetch() {
       this.reset()
       this.fetch()
@@ -140,6 +177,10 @@ export default {
     },
     updateMulti(multi) {
       this.multiple = multi
+      if (!multi) {
+        this.replays = []
+        this.period = {}
+      }
     },
     updateRange({start, end}) {
       this.criteria.dtstart = start

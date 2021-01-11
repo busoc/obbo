@@ -17,6 +17,7 @@ function commonRoutes(prefix) {
   return [
     {path: 'new', name:`${prefix}.new.request`, component: NewRequest},
     {path: ':id/cancel', name: `${prefix}.request.cancel`, component: CancelRequest},
+    {path: 'cancel', name: `${prefix}.request.cancel.all`, component: CancelRequest},
     {path: ':id/edit', name: `${prefix}.request.priority`, component: EditRequest},
   ]
 }
