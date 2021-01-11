@@ -1,19 +1,27 @@
 <template>
   <div class="mx-3">
     <router-link v-if="multiple"
-      :to="{name: editRoute, query: period}"
-      title="edit new request from selected requests"
+      :to="{name: newRoute, query: period}"
+      title="create new request from selected requests"
       @click="updateMultiple"
-      class="btn btn-primary btn-sm mx-1"
+      class="btn btn-secondary btn-sm mx-1"
       :class="{disabled: disableEdit}">
       <i data-feather="plus-square"></i>
     </router-link>
     <router-link v-if="multiple"
-      :to="{name: cancelRoute, query: {replay: this.replays}}"
+      :to="{name: editRoute, query: {replay: replays}}"
+      title="edit request from selected requests"
+      @click="updateMultiple"
+      class="btn btn-primary btn-sm mx-1"
+      :class="{disabled: disableReplays}">
+      <i data-feather="edit"></i>
+    </router-link>
+    <router-link v-if="multiple"
+      :to="{name: cancelRoute, query: {replay: replays}}"
       title="cancel selected requests"
       @click="updateMultiple"
       class="btn btn-danger btn-sm mx-1"
-      :class="{disabled: disableCancel}">
+      :class="{disabled: disableReplays}">
       <i data-feather="trash-2"></i>
     </router-link>
     <button type="button"
@@ -35,6 +43,7 @@ export default {
     'period',
     'replays',
     'cancelRoute',
+    'newRoute',
     'editRoute'
   ],
   data() {
@@ -46,7 +55,7 @@ export default {
     disableEdit() {
       return !this.period || Object.keys(this.period) == 0 || !this.period.dtstart || !this.period.dtend
     },
-    disableCancel() {
+    disableReplays() {
       return !this.replays || this.replays.length == 0
     },
   },

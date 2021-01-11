@@ -6,7 +6,8 @@
           :period="isoPeriod"
           :replays="replays"
           :cancelRoute="'replay.request.cancel.all'"
-          :editRoute="'replay.new.request'"
+          :newRoute="'replay.new.request'"
+          :editRoute="'replay.request.priority.all'"
           @update:multiple="updateMulti"/>
     </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">

@@ -4,9 +4,10 @@
     <PageHeader :title="'VMU Gaps'">
       <GroupSelect v-if="gaps && gaps.length > 0"
         :period="isoPeriod"
-        :replays="replays"
+        :replays="replayList"
         :cancelRoute="'vmu.request.cancel.all'"
-        :editRoute="'vmu.new.request'"
+        :newRoute="'vmu.new.request'"
+        :editRoute="'vmu.request.priority.all'"
         @update:multiple="updateMultiple"/>
     </PageHeader>
     <div class="d-flex justify-content-between my-3 px-3">
@@ -158,6 +159,9 @@ export default {
       }
       return {dtstart, dtend}
     },
+    replayList() {
+      return _.uniq(this.replays.map(i => i.replay))
+    },
   },
   watch: {
     $route(to, from) {
@@ -174,9 +178,9 @@ export default {
   },
   methods: {
     selectReplay(r) {
-      let x = this.replays.indexOf(r.replay)
+      let x = this.replays.findIndex(i => i.id == r.id && i.replay == r.replay)
       if (x < 0) {
-        this.replays.push(r.replay)
+        this.replays.push({id: r.id, replay: r.replay})
       } else {
         this.replays.splice(x, 1)
       }

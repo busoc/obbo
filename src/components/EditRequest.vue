@@ -45,12 +45,15 @@ export default {
       if (this.working) {
         return
       }
-      let q = {
-        priority: parseInt(this.priority),
-        id: this.$route.params.id,
+      let replays = []
+      if (this.$route.params.id) {
+        replays.push(this.$route.params.id)
+      }
+      if (this.$route.query.replay) {
+        this.$route.query.replay.forEach(i => replays.push(i))
       }
       this.working = true
-      this.$store.dispatch('update.request', q).then(() => {
+      this.$store.dispatch('update.request.all', {replays, priority: parseInt(this.priority)}).then(() => {
         this.$router.push(this.origin)
         this.working = false
       }).catch(err => {

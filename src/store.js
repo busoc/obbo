@@ -196,6 +196,12 @@ const actions = {
       return Promise.resolve("")
     })
   },
+  'update.request.all'({dispatch}, {replays, priority}) {
+    let ps = replays.map(i => {
+      return dispatch('update.request', {priority, id: i})
+    })
+    return Promise.all(ps)
+  },
   'update.variable'(_, {id, data}) {
     return fetch(`${buildURL("config")}${id}`, {headers, method: 'PUT', body: JSON.stringify(data)}).then(rs => {
       if (!rs.ok) {
