@@ -19,7 +19,7 @@ const Periods = [
 ]
 
 function formatTime(str) {
-  let when = DateTime.fromISO(str)
+  let when = DateTime.fromISO(str).toUTC()
   return when.toFormat(DoyFormat)
 }
 

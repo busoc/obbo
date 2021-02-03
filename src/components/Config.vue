@@ -2,7 +2,7 @@
   <div>
     <router-view></router-view>
     <PageHeader :title="'settings'"/>
-    <table class="table table-hover my-3">
+    <table class="table table-hover my-3 table-sm">
       <thead class="thead-dark">
         <tr>
           <th class="text-capitalize">Parameter</th>

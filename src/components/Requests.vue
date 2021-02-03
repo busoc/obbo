@@ -22,7 +22,7 @@
       <SortBy :fields="sortFields" @update:sort="updateSort"/>
     </div>
     <Loading />
-    <table class="table table-hover my-3" v-if="requests && requests.length">
+    <table class="table table-hover my-3 table-sm" v-if="requests && requests.length">
       <thead class="thead-dark">
         <tr>
           <th v-if="multiple"></th>

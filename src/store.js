@@ -46,6 +46,9 @@ const getters = {
   totalVMU(state) {
     return state.status.vmu ? state.status.vmu.count : 0
   },
+  totalDuration(state) {
+    return state.status.requests ? state.status.requests.duration : 0
+  },
   autobrm(state) {
     return state.status.autobrm
   },
