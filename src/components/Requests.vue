@@ -70,7 +70,7 @@
 
 <script>
 import {DateTime} from 'luxon'
-import {RFC3339} from './intervals.js'
+import {DoyFormat, RFC3339} from './intervals.js'
 import $ from 'jquery'
 import 'bootstrap'
 import _ from 'lodash'

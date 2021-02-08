@@ -23,7 +23,7 @@
   </form>
 </template>
 <script>
-import {RFC3339, DoyFormat, Periods} from '../intervals.js'
+import {DoyFormat, Periods} from '../intervals.js'
 import {DateTime, Duration} from 'luxon'
 
 export default {
@@ -49,14 +49,14 @@ export default {
       let q = {}
 
       if (start.isValid) {
-        q.start = start.toFormat(RFC3339)
+        q.start = start.toFormat(DoyFormat)
         this.errors.dtstart = false
       } else {
         this.errors.dtstart = true
         return
       }
       if (end.isValid) {
-        q.end = end.toFormat(RFC3339)
+        q.end = end.toFormat(DoyFormat)
         this.errors.dtend = false
       } else {
         this.errors.dtend = true
