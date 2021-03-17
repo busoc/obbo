@@ -40,7 +40,10 @@
       </div>
       <div class="modal-footer">
         <router-link :to="origin" class="btn btn-secondary">close</router-link>
-        <button :disabled="errors.dtstart || errors.dtend" @click="register" type="button" class="btn btn-primary">save</button>
+        <button :disabled="errors.dtstart || errors.dtend" @click="register" type="button" class="btn btn-primary">
+          <span v-if="working" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span v-else>save</span>
+        </button>
       </div>
     </div>
   </div>
@@ -62,6 +65,7 @@ export default {
       dtend: "",
       priority: "",
       comment: "",
+      working: false,
       err: "",
       errors: {
         dtstart: false,
@@ -88,6 +92,9 @@ export default {
       }
     },
     register() {
+      if (this.workking) {
+        return
+      }
       let start = DateTime.fromFormat(this.dtstart, DoyFormat)
       let end = DateTime.fromFormat(this.dtend, DoyFormat)
       let q = {
@@ -117,9 +124,14 @@ export default {
         return
       }
 
+      this.working = true
       this.$store.dispatch("register.request", q)
-        .catch(rs => this.err = rs)
+        .catch(rs => {
+          this.err = rs
+          this.working = false
+        })
         .then(() => {
+          this.working = false
           this.$router.push(this.origin)
         })
     }

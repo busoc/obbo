@@ -54,14 +54,14 @@
         </div>
       </div>
     </div>
-    <div class="px-3 my-4">
+    <!-- <div class="px-3 my-4">
       <div class="row">
         <div class="col-8">
         </div>
         <div class="col-4">
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
