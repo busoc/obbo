@@ -30,8 +30,6 @@
           <th class="text-center text-capitalize">Status</th>
           <th class="text-capitalize">Starts</th>
           <th class="text-capitalize">Ends</th>
-          <th class="text-center text-capitalize">Missing</th>
-          <th class="text-center text-capitalize">Corrupted</th>
           <th class="text-center text-capitalize">Priority</th>
           <th class="text-center text-capitalize">Automatic</th>
           <th v-if="!multiple"></th>
@@ -46,8 +44,6 @@
           <td class="text-center">{{r.status}}</td>
           <td>{{formatTime(r.dtstart)}}</td>
           <td>{{formatTime(r.dtend)}}</td>
-          <td class="text-center">{{r.missing}}</td>
-          <td class="text-center">{{r.corrupted}}</td>
           <td class="text-center">{{r.priority == -1 ? '-' : r.priority}}</td>
           <td class="text-center">
             <i v-if="r.automatic" data-feather="award"></i>
@@ -70,7 +66,7 @@
 
 <script>
 import {DateTime} from 'luxon'
-import {DoyFormat, RFC3339} from './intervals.js'
+import {RFC3339} from './intervals.js'
 import $ from 'jquery'
 import 'bootstrap'
 import _ from 'lodash'

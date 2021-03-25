@@ -14,11 +14,6 @@
           <i data-feather="cpu"></i>
         </router-link>
       </li>
-      <!-- <li class="nav-item">
-        <a href="#" class="nav-link px-2 mx-1" title="edit settings">
-          <i data-feather="code"></i>
-        </a>
-      </li> -->
     </ul>
   </nav>
 </template>
