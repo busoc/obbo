@@ -55,9 +55,17 @@ export default {
       }
     },
     curr() {
-      return this.values.length ? _.last(this.values, 'time') : {}
+      let obj = this.values.length ? _.last(this.values, 'time') : {}
+      if (obj.time && obj.time.toISODate() == DateTime.local().toISODate()) {
+        return obj
+      }
+      return {}
     },
     diff() {
+      let obj = this.values.length ? _.last(this.values, 'time') : {}
+      if (!obj.time || obj.time.toISODate() != DateTime.local().toISODate()) {
+        return 0
+      }
       let last = _.takeRight(this.values, 2)
       if (last.length < 2) {
         return 0
